@@ -15,6 +15,7 @@ from PySide6.QtCore import Qt, Signal
 from clientUtilities.clientManager import ClientManager
 from launcherUtilities.webserverManager import WebServerManager
 from launcherUtilities.widgets import AvatarWidget
+from launcherUtilities.cookieGrabber import CookieGrabber
 
 discord_url = "https://discord.gg/vMjXzuKqs5"
 
@@ -190,7 +191,7 @@ class GUIInterface(QWidget):
         "LegacyPlay creators hope you will enjoy it.",
         "Reviving classic ROBLOX experience",
         "Preserving retro clients since early 2025",
-        "Version: Beta 0.781 | Build Date 0706",
+        "Version: Beta 0.784 | Build Date 0806",
         "Open-Source. Local. Retro.",
         "Powered by Python with the help of Qt 6/PySide6",
         f"You've launched LegacyPlay on {datetime.datetime.now().strftime('%Y-%m-%d')}",
@@ -204,9 +205,10 @@ class GUIInterface(QWidget):
         f"Join our Discord! {discord_url}"
     ]
 
-    def __init__(self, webserver_manager: WebServerManager):
+    def __init__(self, webserver_manager: WebServerManager, cookie_grabber: CookieGrabber):
         super().__init__()
         self.webserver_manager = webserver_manager
+        self.cookie_grabber = cookie_grabber
         self.clManager = ClientManager(self.webserver_manager, self)
         self.setWindowTitle("LegacyPlay")
         self.setFixedSize(720, 600)
@@ -484,7 +486,7 @@ class GUIInterface(QWidget):
 
         content = QLabel(
             "LegacyPlay Launcher Application\n\n"
-            "Version: Beta 0.781 | Build Date 0706\n"
+            "Version: Beta 0.784 | Build Date 0806\n"
             f"Compiled using Python {sys.version_info.major}.{sys.version_info.minor}\n"
             "Graphics Framework used: Qt 6/PySide6\n"
         )
@@ -786,12 +788,61 @@ class GUIInterface(QWidget):
         else:
             print("Cookie is in the launcher data file, no action needed.")
 
+    def retrieve_cookie_auto(self, input_field: QLineEdit):
+        theme = self.get_current_theme_colors()
+        retrieved_cookie = self.cookie_grabber.get_cookie_from_system()
+
+        message_box_style = f"""
+            QMessageBox {{
+                background-color: {theme['primary']};
+                color: {theme['text']};
+            }}
+            QMessageBox QLabel {{
+                color: {theme['text']};
+                font-size: 13px;
+            }}
+            QMessageBox QPushButton {{
+                padding: 8px 25px;
+                border: none;
+                border-radius: 5px;
+                background-color: {theme['hover']};
+                color: white;
+                min-width: 80px;
+            }}
+            QMessageBox QPushButton:hover {{
+                background-color: {self.darken_color(theme['hover'], 0.9)};
+            }}
+            QMessageBox QPushButton:pressed {{
+                background-color: {self.darken_color(theme['hover'], 0.8)};
+            }}
+        """
+
+        if not retrieved_cookie:
+            msg_box = QMessageBox(self)
+            msg_box.setIcon(QMessageBox.Warning)
+            msg_box.setWindowTitle("Failed")
+            msg_box.setText("Failed to retrieve the cookie automatically, please get one yourself from https://www.roblox.com/.")
+            msg_box.setStandardButtons(QMessageBox.Ok)
+            msg_box.setStyleSheet(message_box_style)
+            msg_box.exec()
+            return
+        
+        input_field.setText(retrieved_cookie)
+
+        msg_box = QMessageBox(self)
+        msg_box.setIcon(QMessageBox.Information)
+        msg_box.setWindowTitle("Success")
+        msg_box.setText("Successfully retrieved cookie! You may continue now by pressing the \"Save Cookie\" button.")
+        msg_box.setStandardButtons(QMessageBox.Ok)
+        msg_box.setStyleSheet(message_box_style)
+        msg_box.exec()
+
     def prompt_for_roblox_cookie(self, initial=True):
         theme = self.get_current_theme_colors()
         dialog = QDialog(self)
         dialog.setWindowTitle("Action Required" if initial else "Change Roblox Cookie")
         dialog.setWindowIcon(self.icon)
-        dialog.setFixedSize(450, 200)
+        dialog.setFixedSize(500, 230)
         dialog.setStyleSheet(f"""
             QDialog {{
                 background-color: {theme['primary']};
@@ -851,13 +902,19 @@ class GUIInterface(QWidget):
         input_field.setEchoMode(QLineEdit.Password)
         input_field.setMinimumHeight(40)
 
-        button_box = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
-            Qt.Horizontal,
-            dialog
-        )
+        buttons_layout = QHBoxLayout()
+        buttons_layout.setSpacing(10)
+        buttons_layout.setContentsMargins(0, 0, 0, 0)
+
+        auto_button = QPushButton("Retrieve it")
+        auto_button.setFixedSize(100, 32)
+        auto_button.clicked.connect(lambda: self.retrieve_cookie_auto(input_field))
+
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, dialog)
         button_box.button(QDialogButtonBox.Ok).setText("Save Cookie")
+        button_box.button(QDialogButtonBox.Ok).setFixedSize(150, 32)
         button_box.button(QDialogButtonBox.Cancel).setText("Exit")
+        button_box.button(QDialogButtonBox.Cancel).setFixedSize(100, 32)
         button_box.accepted.connect(lambda: self.save_cookie_and_close(input_field.text(), dialog))
 
         if initial:
@@ -865,15 +922,18 @@ class GUIInterface(QWidget):
         else:
             button_box.rejected.connect(dialog.reject)
 
+        buttons_layout.addWidget(auto_button)
+        buttons_layout.addStretch(1)
+        buttons_layout.addWidget(button_box)
+
         layout.addWidget(title_label)
         layout.addWidget(info_label)
         layout.addWidget(input_field)
-        layout.addWidget(button_box)
+        layout.addLayout(buttons_layout)
 
         if initial:
             def reject():
                 pass
-
             dialog.reject = reject
             dialog.setWindowFlag(Qt.WindowCloseButtonHint, False)
             dialog.setWindowFlags(Qt.Window | Qt.CustomizeWindowHint | Qt.WindowTitleHint)
@@ -881,10 +941,11 @@ class GUIInterface(QWidget):
         dialog.exec()
 
     def save_cookie_and_close(self, cookie, dialog):
+        theme = self.get_current_theme_colors()
+
         if not cookie:
             print("Cookie is empty.")
 
-            theme = self.get_current_theme_colors()
             msg = QMessageBox(self)
             msg.setIcon(QMessageBox.Warning)
             msg.setWindowTitle("Invalid Input")
@@ -919,7 +980,6 @@ class GUIInterface(QWidget):
         elif not cookie.startswith("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|"):
             print("Invalid cookie.")
 
-            theme = self.get_current_theme_colors()
             msg = QMessageBox(self)
             msg.setIcon(QMessageBox.Warning)
             msg.setWindowTitle("Invalid Input")

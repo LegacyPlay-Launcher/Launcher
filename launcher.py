@@ -26,6 +26,7 @@ from launcherUtilities.sslManager import SSLManager
 from launcherUtilities.rpcManager import RPCManager
 from launcherUtilities.logger import Tee
 from launcherUtilities.updatesManager import UpdatesManager
+from launcherUtilities.cookieGrabber import CookieGrabber
 from clientUtilities.clientManager import ClientManager
 # from launcherUtilities.tests import TestValues (OUTDATED)
 
@@ -79,10 +80,11 @@ if __name__ == "__main__":
     webserver_manager = WebServerManager()
     client_manager = ClientManager(webserver_manager)
     ssl_manager = SSLManager()
+    cookie_grabber = CookieGrabber()
 
     print("Instancing GUI and calling neccesary functions...")
 
-    window = GUIInterface(webserver_manager)
+    window = GUIInterface(webserver_manager, cookie_grabber)
     window.addClients("./Clients/")
 
     print("Running checks (except admin check)...")
