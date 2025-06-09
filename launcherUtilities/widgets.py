@@ -10,7 +10,7 @@ class AvatarWidget(QWidget):
     leftLegClicked = Signal()
     rightLegClicked = Signal()
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.setFixedSize(200, 300)
         self.setStyleSheet("background-color: transparent;")
@@ -23,7 +23,7 @@ class AvatarWidget(QWidget):
 
         print("AvatarWidget initialization success.")
 
-    def paintEvent(self, event):
+    def paintEvent(self, event) -> None:
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
@@ -45,7 +45,7 @@ class AvatarWidget(QWidget):
         painter.setBrush(QColor(self.right_leg_color))
         painter.drawRect(100, 170, 30, 80)
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event) -> None:
         if event.button() == Qt.LeftButton:
             x, y = event.pos().x(), event.pos().y()
             if 75 <= x <= 125 and 20 <= y <= 70:

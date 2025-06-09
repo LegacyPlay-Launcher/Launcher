@@ -1,12 +1,14 @@
+from OpenSSL.crypto import X509
+
 import subprocess
 import os
 from OpenSSL import crypto
 
 class SSLManager:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
-    def checkForSSLInstalled(self, sslPath):
+    def checkForSSLInstalled(self, sslPath) -> bool:
         try:
             cert = self._load_certificate(sslPath)
             cert_serial = "{:X}".format(cert.get_serial_number()).zfill(40)
@@ -28,7 +30,7 @@ class SSLManager:
             print(f"Error checking SSL installation: {e}")
             return False
 
-    def installSSL(self, sslPath):
+    def installSSL(self, sslPath) -> None:
         try:
             if not self.checkForSSLInstalled(sslPath):
                 subprocess.run(
@@ -42,7 +44,7 @@ class SSLManager:
         except Exception as e:
             print(f"Error installing SSL: {e}")
 
-    def _load_certificate(self, sslPath):
+    def _load_certificate(self, sslPath) -> X509:
         with open(sslPath, 'rb') as f:
             cert_data = f.read()
         return crypto.load_certificate(crypto.FILETYPE_PEM, cert_data)

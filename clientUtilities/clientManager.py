@@ -1,3 +1,6 @@
+from typing import Literal, LiteralString
+
+
 import subprocess
 import threading
 import os
@@ -8,19 +11,14 @@ import base64
 from launcherUtilities.webserverManager import WebServerManager
 
 class ClientManager:
-    def __init__(self, webserver_manager: WebServerManager = None, guiInterface = None):
+    def __init__(self, webserver_manager: WebServerManager = None, guiInterface = None) -> None:
         self._webserver_manager = webserver_manager
         self._rpc_manager = None
         self._guiInterface = guiInterface
         self._client = "2012L"
         self.isPlaying = False
 
-    def _watchThread(self, clientProcess: subprocess.Popen):
-        if not clientProcess:
-            print("WatchThread: No client process is provided.")
-            self.isPlaying = False
-            return False
-        
+    def _watchThread(self, clientProcess: subprocess.Popen) -> Literal[True]:  
         print("WatchThread: Client started.")
         
         if self._rpc_manager:  
@@ -46,18 +44,18 @@ class ClientManager:
 
         return True
     
-    def encode(self, text):
+    def encode(self, text) -> str:
         encoded_bytes = base64.b64encode(text.encode('utf-8'))
         encoded_string = encoded_bytes.decode('utf-8')
         return encoded_string
     
-    def setRPC(self, rpcClass):
+    def setRPC(self, rpcClass) -> None:
         self._rpc_manager = rpcClass
 
-    def setClient(self, client):
+    def setClient(self, client) -> None:
         self._client = client
 
-    def copy_place(self, place_path):
+    def copy_place(self, place_path) -> None:
         try:
             if os.path.exists(f"./Clients/{self._client}/content/place"):
                 os.remove(f"./Clients/{self._client}/content/place")
@@ -66,7 +64,7 @@ class ClientManager:
         except Exception as e:
             print(f"An error occurred while copying place: {e}")
 
-    def host(self, port):
+    def host(self, port) -> tuple[Literal[False], Literal['Clients directory does not exist.']] | tuple[Literal[False], Literal['The selected client\'s directory does not exist.']] | tuple[Literal[False], LiteralString] | tuple[Literal[True], None]:
         clientsDir = os.path.join('.', 'Clients')
 
         if not os.path.exists(clientsDir):
@@ -99,7 +97,7 @@ class ClientManager:
 
         return True, None
     
-    def join(self, ip, port, charData): # charData format: head_bc;left_arm_bc;torso_bc;right_arm_bc;left_leg_bc;right_leg_bc;shirt_id;pants_id
+    def join(self, ip, port, charData) -> tuple[Literal[False], Literal['Clients directory does not exist.']] | tuple[Literal[False], Literal['The selected client\'s directory does not exist.']] | tuple[Literal[False], LiteralString] | tuple[Literal[True], None]: # charData format: head_bc;left_arm_bc;torso_bc;right_arm_bc;left_leg_bc;right_leg_bc;shirt_id;pants_id
         clientsDir = os.path.join('.', 'Clients')
 
         if not os.path.exists(clientsDir):
@@ -144,6 +142,6 @@ class ClientManager:
 
         return True, None
     
-    def killAllClients(self):
+    def killAllClients(self) -> None:
         subprocess.Popen(["taskkill", "/F", "/IM", "LegacyPlayerBeta.exe"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW)
         subprocess.Popen(["taskkill", "/F", "/IM", "LegacyApp.exe"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW)

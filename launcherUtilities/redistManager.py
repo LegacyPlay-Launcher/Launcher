@@ -10,7 +10,7 @@ import winreg
 class RedistWorker(QObject):
     finished = Signal(bool, str)
 
-    def run(self):
+    def run(self) -> None:
         temp_path = os.path.join(os.environ["TEMP"], "vc_redist.x64.exe")
         try:
             urllib.request.urlretrieve(RedistManager.VC_REDIST_URL, temp_path)
@@ -18,7 +18,7 @@ class RedistWorker(QObject):
         except Exception as e:
             self.finished.emit(False, f"Failed to download or run installer: {e}")
 
-    def run_installer(self, installer_path):
+    def run_installer(self, installer_path) -> None:
         try:
             subprocess.run([installer_path, "/quiet", "/norestart"], check=True)
             self.finished.emit(True, "Installation completed successfully.")
@@ -28,7 +28,7 @@ class RedistWorker(QObject):
 class RedistManager(QDialog):
     VC_REDIST_URL = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("VC++ Redistributable Check")
         self.setFixedSize(400, 200)
@@ -82,7 +82,7 @@ class RedistManager(QDialog):
 
         print("RedistManager initialization success.")
 
-    def check_redist_installed(self):
+    def check_redist_installed(self) -> bool:
         keys_to_check = [
             r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
         ]
@@ -103,7 +103,7 @@ class RedistManager(QDialog):
                 continue
         return False
 
-    def start_installation(self):
+    def start_installation(self) -> None:
         self.progress = QProgressDialog("Downloading and Installing VC++ Redist x64...", "Cancel", 0, 0, self)
         self.progress.setWindowTitle("Installation Progress")
         self.progress.setWindowModality(Qt.WindowModal)
@@ -153,7 +153,7 @@ class RedistManager(QDialog):
         self.thread.started.connect(self.worker.run)
         self.thread.start()
 
-    def on_finished(self, success, message):
+    def on_finished(self, success, message) -> None:
         redist_path = os.path.join(os.environ["TEMP"], "vc_redist.x64.exe")
         if os.path.exists(redist_path):
             os.remove(redist_path)

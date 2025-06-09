@@ -2,7 +2,7 @@ import ctypes
 from PySide6.QtWidgets import QMessageBox
 
 class AdminCheck:
-    def __init__(self):
+    def __init__(self) -> None:
         self.admin = False
 
         try:
@@ -12,7 +12,7 @@ class AdminCheck:
 
         print("AdminCheck initialization success.")
 
-    def is_admin(self):
+    def is_admin(self) -> bool:
         if not self.admin:
             msg_box = QMessageBox()
             msg_box.setWindowTitle("Admin Check")

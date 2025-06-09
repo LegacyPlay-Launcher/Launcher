@@ -2,6 +2,7 @@ import os
 import random
 import json
 import datetime
+from typing import Never
 import webbrowser
 import sys
 from PySide6.QtWidgets import (
@@ -79,7 +80,7 @@ brick_colors = {
 class ColorPickerDialog(QDialog):
     colorSelected = Signal(int)
 
-    def __init__(self, parent=None, dark_mode=False):
+    def __init__(self, parent=None, dark_mode=False) -> None:
         super().__init__(parent)
         self.setWindowTitle("Choose a color!")
         self.setFixedSize(600, 400)
@@ -158,7 +159,7 @@ class ColorPickerDialog(QDialog):
 
         print("ColorPickerDialog initialization success.")
 
-    def populate_colors(self):
+    def populate_colors(self) -> None:
         row = col = 0
         columns = 12
         
@@ -205,7 +206,7 @@ class GUIInterface(QWidget):
         f"Join our Discord! {discord_url}"
     ]
 
-    def __init__(self, webserver_manager: WebServerManager, cookie_grabber: CookieGrabber):
+    def __init__(self, webserver_manager: WebServerManager, cookie_grabber: CookieGrabber) -> None:
         super().__init__()
         self.webserver_manager = webserver_manager
         self.cookie_grabber = cookie_grabber
@@ -249,14 +250,14 @@ class GUIInterface(QWidget):
 
         print("GUIInterface initialization success.")
 
-    def get_current_tab_index(self):
+    def get_current_tab_index(self) -> int:
         return self.tabs.currentIndex()
 
-    def setRPC(self, rpcClass):
+    def setRPC(self, rpcClass) -> None:
         self.rpc = rpcClass
         self.clManager.setRPC(rpcClass)
 
-    def create_launch_tab(self):
+    def create_launch_tab(self) -> QWidget:
         launch_tab = QWidget()
         main_layout = QVBoxLayout(launch_tab)
         
@@ -313,7 +314,7 @@ class GUIInterface(QWidget):
         
         return launch_tab
 
-    def create_settings_tab(self):
+    def create_settings_tab(self) -> QWidget:
         settings_tab = QWidget()
         main_layout = QVBoxLayout(settings_tab)
         
@@ -363,7 +364,7 @@ class GUIInterface(QWidget):
         
         return settings_tab
 
-    def create_launcher_settings_tab(self):
+    def create_launcher_settings_tab(self) -> QWidget:
         launcher_settings_tab = QWidget()
         main_layout = QVBoxLayout(launcher_settings_tab)
         
@@ -399,7 +400,7 @@ class GUIInterface(QWidget):
         
         return launcher_settings_tab
 
-    def create_avatar_tab(self):
+    def create_avatar_tab(self) -> QWidget:
         avatar_tab = QWidget()
         layout = QVBoxLayout(avatar_tab)
         
@@ -476,7 +477,7 @@ class GUIInterface(QWidget):
         
         return avatar_tab
     
-    def create_about_tab(self):
+    def create_about_tab(self) -> QWidget:
         about_tab = QWidget()
         layout = QVBoxLayout(about_tab)
         
@@ -529,7 +530,7 @@ class GUIInterface(QWidget):
         
         return about_tab
     
-    def get_current_theme_colors(self):
+    def get_current_theme_colors(self) -> dict[str, str]:
         return {
             "dark": {
                 "primary": "#1a1a1a",
@@ -559,12 +560,12 @@ class GUIInterface(QWidget):
         b = max(0, min(255, int(b * factor)))
         return f"#{r:02x}{g:02x}{b:02x}"
     
-    def open_color_picker(self, part):
+    def open_color_picker(self, part) -> None:
         dialog = ColorPickerDialog(self, dark_mode=self.dark_mode)
         dialog.colorSelected.connect(lambda cid: self.update_avatar_color(part, cid))
         dialog.exec()
     
-    def update_avatar_color(self, part, color_id):
+    def update_avatar_color(self, part, color_id) -> None:
         print(f"Color change received for {part} - ID: {color_id if color_id else None}")
         
         part_indices = {
@@ -588,7 +589,7 @@ class GUIInterface(QWidget):
         print(f"Current colors: {self.body_colors}")
         self.save_user_data()
 
-    def apply_avatar_colors(self):
+    def apply_avatar_colors(self) -> None:
         try:
             self.body_colors = [int(c) for c in self.body_colors]
         except (ValueError, TypeError):
@@ -604,7 +605,7 @@ class GUIInterface(QWidget):
         
         self.avatar_widget.update()
     
-    def on_tab_changed(self, index):
+    def on_tab_changed(self, index) -> None:
         tab_names = {
             0: "in the launch menu",
             1: "configuring settings",
@@ -615,7 +616,7 @@ class GUIInterface(QWidget):
         if self.rpc and not self.clManager.isPlaying:
             self.rpc.updatePresence(tab_names.get(index, 'unknown').capitalize())
 
-    def load_stylesheet(self, arrow_svg):
+    def load_stylesheet(self, arrow_svg) -> str:
         return f"""
         QWidget {{
             background-color: #1a1a1a;
@@ -683,7 +684,7 @@ class GUIInterface(QWidget):
         }}
         """
 
-    def load_user_data(self):
+    def load_user_data(self) -> None:
         default_data = {
             "username": f"LegacyUser_{random.randint(1000, 9999)}",
             "user_id": str(random.randint(10000000, 99999999)),
@@ -719,13 +720,13 @@ class GUIInterface(QWidget):
 
         print(f"Current colors: {self.body_colors}")
 
-    def on_id_changed(self):
+    def on_id_changed(self) -> None:
         self.shirtId = self.shirt_id_input.text()
         self.pantsId = self.pants_id_input.text()
 
         self.save_user_data()
 
-    def save_user_data(self):
+    def save_user_data(self) -> None:
         data = {
             "username": self.settings_username_field.text(),
             "user_id": self.settings_user_id_field.text(),
@@ -740,7 +741,7 @@ class GUIInterface(QWidget):
         with open(self.user_data_file, 'w') as f:
             json.dump(data, f, indent=4)
 
-    def load_launcher_data(self):
+    def load_launcher_data(self) -> None:
         default_data = {
             "dark_mode": True,
             "robloxCookie_cc434b1ae21827962753dcb87aa9f49e2e18fc273e8d2f73b955b8e37abd4c47ca0bf5e6a9f4098fe8333d4a52ed26e221f234a493ab10ce241d4b5bf72d57db3f1df9ad3ae40bb03b2cfece398e1fd446a718055fc18e946c2e087cd0a415647ff84fce855ea0edd665fdc56df2fc7f7ba7c7c959b501a88ec8331c0137fde9fb5bd6de71492dfb4ba63d2eb9cb2b97b98151c37fe46771dfcda74cd460b602a9422d648177d89ac32b47c136d122f0a97b6d038e6058e22f59cfb5c4ebe40027a55cc6a0581768b5161e36f61549ab6a6a4f6c6992b0ea2b0e508032e36986668f9a4f1a81f07f3a2167758857fbcbfe67e10001e5f6d4539762aa41090a87": ""
@@ -758,7 +759,7 @@ class GUIInterface(QWidget):
             self.dark_mode = default_data["dark_mode"]
             self.roblox_cookie = default_data["robloxCookie_cc434b1ae21827962753dcb87aa9f49e2e18fc273e8d2f73b955b8e37abd4c47ca0bf5e6a9f4098fe8333d4a52ed26e221f234a493ab10ce241d4b5bf72d57db3f1df9ad3ae40bb03b2cfece398e1fd446a718055fc18e946c2e087cd0a415647ff84fce855ea0edd665fdc56df2fc7f7ba7c7c959b501a88ec8331c0137fde9fb5bd6de71492dfb4ba63d2eb9cb2b97b98151c37fe46771dfcda74cd460b602a9422d648177d89ac32b47c136d122f0a97b6d038e6058e22f59cfb5c4ebe40027a55cc6a0581768b5161e36f61549ab6a6a4f6c6992b0ea2b0e508032e36986668f9a4f1a81f07f3a2167758857fbcbfe67e10001e5f6d4539762aa41090a87"]
 
-    def save_launcher_data(self):
+    def save_launcher_data(self) -> None:
         data = {
             "dark_mode": self.dark_mode,
             "robloxCookie_cc434b1ae21827962753dcb87aa9f49e2e18fc273e8d2f73b955b8e37abd4c47ca0bf5e6a9f4098fe8333d4a52ed26e221f234a493ab10ce241d4b5bf72d57db3f1df9ad3ae40bb03b2cfece398e1fd446a718055fc18e946c2e087cd0a415647ff84fce855ea0edd665fdc56df2fc7f7ba7c7c959b501a88ec8331c0137fde9fb5bd6de71492dfb4ba63d2eb9cb2b97b98151c37fe46771dfcda74cd460b602a9422d648177d89ac32b47c136d122f0a97b6d038e6058e22f59cfb5c4ebe40027a55cc6a0581768b5161e36f61549ab6a6a4f6c6992b0ea2b0e508032e36986668f9a4f1a81f07f3a2167758857fbcbfe67e10001e5f6d4539762aa41090a87": self.roblox_cookie
@@ -766,7 +767,7 @@ class GUIInterface(QWidget):
         with open(self.launcher_data_file, 'w') as f:
             json.dump(data, f)
 
-    def choose_place(self):
+    def choose_place(self) -> None:
         file_name, _ = QFileDialog.getOpenFileName(
             self, "Select Place File", "", 
             "Roblox Files (*.rbxl *.rbxlx);;All Files (*)"
@@ -775,13 +776,13 @@ class GUIInterface(QWidget):
             self._place_file_path = file_name
             self.place_label.setText(os.path.basename(file_name))
 
-    def open_discord_url(self):
+    def open_discord_url(self) -> None:
         webbrowser.open(discord_url)
 
-    def change_cookie(self):
+    def change_cookie(self) -> None:
         self.prompt_for_roblox_cookie(initial=False)
 
-    def check_roblox_cookie(self):
+    def check_roblox_cookie(self) -> None:
         if not self.roblox_cookie:
             print(".ROBLOSECURITY cookie is required, prompting...")
             self.prompt_for_roblox_cookie(initial=True)
@@ -837,7 +838,7 @@ class GUIInterface(QWidget):
         msg_box.setStyleSheet(message_box_style)
         msg_box.exec()
 
-    def prompt_for_roblox_cookie(self, initial=True):
+    def prompt_for_roblox_cookie(self, initial=True) -> None:
         theme = self.get_current_theme_colors()
         dialog = QDialog(self)
         dialog.setWindowTitle("Action Required" if initial else "Change Roblox Cookie")
@@ -940,7 +941,7 @@ class GUIInterface(QWidget):
 
         dialog.exec()
 
-    def save_cookie_and_close(self, cookie, dialog):
+    def save_cookie_and_close(self, cookie, dialog) -> None:
         theme = self.get_current_theme_colors()
 
         if not cookie:
@@ -1018,7 +1019,7 @@ class GUIInterface(QWidget):
 
         print("Successfully saved cookie!")
 
-    def close_app_with_warning(self, dialog):
+    def close_app_with_warning(self, dialog) -> Never:
         print("User rejected to paste the cookie, preparing to quit.")
 
         dialog.reject()
@@ -1059,29 +1060,29 @@ class GUIInterface(QWidget):
         
         sys.exit()
 
-    def get_place_file_path(self):
+    def get_place_file_path(self) -> str | None:
         return self._place_file_path
 
-    def get_client_name(self):
+    def get_client_name(self) -> str:
         return self.client_select.currentText()
 
-    def get_ip(self):
+    def get_ip(self) -> str:
         return self.ip_field.text()
 
-    def get_port(self):
+    def get_port(self) -> str:
         return self.port_field.text()
 
-    def addClients(self, clientsDir):
+    def addClients(self, clientsDir) -> None:
         try:
             clients = [d for d in os.listdir(clientsDir) if os.path.isdir(os.path.join(clientsDir, d))]
             self.client_select.addItems(clients)
         except Exception as e:
             print(f"Client loading error: {str(e)}")
 
-    def on_combobox_changed(self, index):
+    def on_combobox_changed(self, index) -> None:
         self.clManager.setClient(self.client_select.itemText(index))
 
-    def prepareHost(self):
+    def prepareHost(self) -> None:
         if not self.validate_hosting():
             return
         self.webserver_manager.clear_www()
@@ -1091,7 +1092,7 @@ class GUIInterface(QWidget):
         if not result:
             self.show_error("Hosting Failed", message)
 
-    def preparePlay(self):
+    def preparePlay(self) -> None:
         if not self.validate_connection():
             return
         
@@ -1114,7 +1115,7 @@ class GUIInterface(QWidget):
         if not result:
             self.show_error("Connection Failed", message)
 
-    def validate_hosting(self):
+    def validate_hosting(self) -> bool:
         if not self._place_file_path:
             self.show_error("Missing File", "Please select a place file to host.")
             return False
@@ -1123,7 +1124,7 @@ class GUIInterface(QWidget):
             return False
         return True
 
-    def validate_connection(self):
+    def validate_connection(self) -> bool:
         if not self.get_ip():
             self.show_error("Invalid IP", "Please enter a valid server address.")
             return False
@@ -1132,15 +1133,15 @@ class GUIInterface(QWidget):
             return False
         return True
 
-    def show_error(self, title, message):
+    def show_error(self, title, message) -> None:
         QMessageBox.warning(self, title, f"{message}\n\nPlease check your settings and try again.")
 
-    def toggle_dark_mode(self, state):
+    def toggle_dark_mode(self, state) -> None:
         self.dark_mode = bool(state)
         self.save_launcher_data()
         self.apply_theme()
 
-    def apply_theme(self):
+    def apply_theme(self) -> None:
         arrow_svg = './Assets/arrow-down-dark.svg' if self.dark_mode else './Assets/arrow-down-light.svg'
         if self.dark_mode:
             self.setStyleSheet(self.load_stylesheet(arrow_svg))

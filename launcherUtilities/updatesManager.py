@@ -1,3 +1,6 @@
+from typing import Any
+
+
 import os
 import sys
 import urllib.request
@@ -8,7 +11,7 @@ class UpdatesManager(QDialog):
     CURRENT_VER_URL = "https://legacyplay.retify.lol/current_ver.txt"
     UPDATER_URL = "https://legacyplay.retify.lol/content/LegacyPlay_Updater.exe"
 
-    def __init__(self, current_version):
+    def __init__(self, current_version) -> None:
         super().__init__()
         self.current_version = current_version
         self.setWindowTitle("LegacyPlay Update Check")
@@ -38,7 +41,7 @@ class UpdatesManager(QDialog):
             }
         """)
 
-    def checkUpdates(self):
+    def checkUpdates(self) -> None:
         try:
             with urllib.request.urlopen(self.CURRENT_VER_URL, timeout=10) as response:
                 online_version = response.read().decode('utf-8').strip()
@@ -70,7 +73,7 @@ class UpdatesManager(QDialog):
 
         sys.exit(0)
 
-    def _ask_user(self, message):
+    def _ask_user(self, message) -> Any:
         dlg = QMessageBox(self)
         dlg.setWindowTitle("Update Available")
         dlg.setText(message)
@@ -80,7 +83,7 @@ class UpdatesManager(QDialog):
         dlg.setStyleSheet(self.styleSheet())
         return dlg.exec() == QMessageBox.Yes
 
-    def _show_message(self, title, message, critical=False):
+    def _show_message(self, title, message, critical=False) -> None:
         dlg = QMessageBox(self)
         dlg.setWindowTitle(title)
         dlg.setText(message)
@@ -89,7 +92,7 @@ class UpdatesManager(QDialog):
         dlg.setStyleSheet(self.styleSheet())
         dlg.exec()
 
-    def _download_updater(self):
+    def _download_updater(self) -> str | None:
         temp_dir = os.environ.get("TEMP") or os.environ.get("TMP")
         if not temp_dir:
             return None

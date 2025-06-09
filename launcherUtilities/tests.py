@@ -3,10 +3,10 @@
 # DO NOT USE IN PRODUCTION!
 
 class TestValues:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
-    def test(self, app):
+    def test(self, app) -> None:
         print(f"Current client: {app.get_client_name()}")
         print(f"Current username: {app.get_username()}")
         print(f"Current user ID: {app.get_user_id()}")

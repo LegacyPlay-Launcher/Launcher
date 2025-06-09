@@ -1,5 +1,5 @@
 class HostsManager:
-    def __init__(self):
+    def __init__(self) -> None:
         self.hosts_file_path = r'C:\Windows\System32\drivers\etc\hosts'
         self.entries = {
             "127.0.0.1 roblox.com\n",
@@ -12,14 +12,14 @@ class HostsManager:
 
         print("HostsManager initialization success.")
 
-    def addHosts(self):
+    def addHosts(self) -> None:
         with open(self.hosts_file_path, 'r') as hosts_file:
             existing_lines = set(hosts_file.readlines())
         with open(self.hosts_file_path, 'a') as hosts_file:
             for entry in self.entries - existing_lines:
                 hosts_file.write(entry)
 
-    def removeHosts(self):
+    def removeHosts(self) -> None:
         with open(self.hosts_file_path, 'r') as hosts_file:
             lines = hosts_file.readlines()
         with open(self.hosts_file_path, 'w') as hosts_file:

@@ -6,7 +6,7 @@ class RPCManager(QObject):
     update_presence_signal = Signal(str)
     RATE_LIMIT = 11
 
-    def __init__(self, client_id):
+    def __init__(self, client_id) -> None:
         super().__init__()
         self.client_id = client_id
         self.rpc = Presence(client_id)
@@ -21,7 +21,7 @@ class RPCManager(QObject):
 
         print("RPCManager initialization success.")
 
-    def _connect_rpc(self):
+    def _connect_rpc(self) -> bool:
         try:
             self.rpc.connect()
             print("Connected to Discord RPC!")
@@ -30,10 +30,10 @@ class RPCManager(QObject):
             print(f"Failed to connect to Discord RPC: {e}")
             return False
 
-    def updatePresence(self, state):
+    def updatePresence(self, state) -> None:
         self.update_presence_signal.emit(state)
 
-    def _handle_update_presence(self, state):
+    def _handle_update_presence(self, state) -> None:
         if not self.connected:
             self.connected = self._connect_rpc()
             if not self.connected:
@@ -50,7 +50,7 @@ class RPCManager(QObject):
             if not self.update_timer.isActive():
                 self.update_timer.start(delay)
 
-    def _send_presence_update(self, state):
+    def _send_presence_update(self, state) -> None:
         try:
             self.rpc.update(
                 state=state,
@@ -63,7 +63,7 @@ class RPCManager(QObject):
         except Exception as e:
             print(f"Failed to update presence: {e}")
 
-    def _process_queued_update(self):
+    def _process_queued_update(self) -> None:
         if self.queued_state:
             self._send_presence_update(self.queued_state)
 
