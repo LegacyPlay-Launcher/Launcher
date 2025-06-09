@@ -192,7 +192,7 @@ class GUIInterface(QWidget):
         "LegacyPlay creators hope you will enjoy it.",
         "Reviving classic ROBLOX experience",
         "Preserving retro clients since early 2025",
-        "Version: Beta 0.784 | Build Date 0806",
+        "Version: Beta 0.790 | Build Date 0906",
         "Open-Source. Local. Retro.",
         "Powered by Python with the help of Qt 6/PySide6",
         f"You've launched LegacyPlay on {datetime.datetime.now().strftime('%Y-%m-%d')}",
@@ -487,7 +487,7 @@ class GUIInterface(QWidget):
 
         content = QLabel(
             "LegacyPlay Launcher Application\n\n"
-            "Version: Beta 0.784 | Build Date 0806\n"
+            "Version: Beta 0.790 | Build Date 0906\n"
             f"Compiled using Python {sys.version_info.major}.{sys.version_info.minor}\n"
             "Graphics Framework used: Qt 6/PySide6\n"
         )
