@@ -13,6 +13,8 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QFont, QIcon
 from PySide6.QtCore import Qt, Signal
 
+from localization import localizationTable
+
 from clientUtilities.clientManager import ClientManager
 from launcherUtilities.webserverManager import WebServerManager
 from launcherUtilities.widgets import AvatarWidget
@@ -82,7 +84,7 @@ class ColorPickerDialog(QDialog):
 
     def __init__(self, parent=None, dark_mode=False) -> None:
         super().__init__(parent)
-        self.setWindowTitle("Choose a color!")
+        self.setWindowTitle("Color Picker")
         self.setFixedSize(600, 400)
         self.setModal(True)
 
@@ -138,10 +140,6 @@ class ColorPickerDialog(QDialog):
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(15, 15, 15, 15)
         self.layout.setSpacing(10)
-
-        self.title_label = QLabel("Choose a color!")
-        self.title_label.setFont(QFont('Segoe UI', 14, QFont.Bold))
-        self.layout.addWidget(self.title_label)
 
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
@@ -208,6 +206,7 @@ class GUIInterface(QWidget):
 
     def __init__(self, webserver_manager: WebServerManager, cookie_grabber: CookieGrabber) -> None:
         super().__init__()
+        self.current_language = "en"
         self.webserver_manager = webserver_manager
         self.cookie_grabber = cookie_grabber
         self.clManager = ClientManager(self.webserver_manager, self)
@@ -226,14 +225,33 @@ class GUIInterface(QWidget):
         self.dark_mode = True
         self.load_user_data()
         self.load_launcher_data()
+
+        print(f"Current Local Settings Language: {self.current_language}.")
+
+        self.localizationTableFCLS = localizationTable.get(self.current_language, None)
+
+        if self.localizationTableFCLS:
+            print(f"Got the localization table for the language {self.current_language}.")
+        else:
+            print(f"Failed to get localization table for language {self.current_language}. Falling back to en.")
+            self.localizationTableFCLS = localizationTable.get("en", {})
+
+            if self.localizationTableFCLS == {}:
+                print("Everything has failed in getting the localization table, falling back to the hardcoded strings.")
+            else:
+                print("Got the localization table for the language en.")
+
+        if self.current_language != "en":
+            self.RANDOM_PHRASES = self.localizationTableFCLS.get("randomPhrases", ["If you see this, the localization fucked itself up. Contact VMsLover."])
+
         self.check_roblox_cookie()
 
         self.tabs = QTabWidget()
-        self.tabs.addTab(self.create_launch_tab(), "Launch")
-        self.tabs.addTab(self.create_settings_tab(), "Settings")
-        self.tabs.addTab(self.create_launcher_settings_tab(), "Launcher Settings")
-        self.tabs.addTab(self.create_avatar_tab(), "Avatar")
-        self.tabs.addTab(self.create_about_tab(), "About")
+        self.tabs.addTab(self.create_launch_tab(), self.localizationTableFCLS.get("title_lp_tab0", "Launch"))
+        self.tabs.addTab(self.create_settings_tab(), self.localizationTableFCLS.get("title_lp_tab1", "User Configuration"))
+        self.tabs.addTab(self.create_launcher_settings_tab(), self.localizationTableFCLS.get("title_lp_tab2", "Launcher Settings"))
+        self.tabs.addTab(self.create_avatar_tab(), self.localizationTableFCLS.get("title_lp_tab3", "Avatar"))
+        self.tabs.addTab(self.create_about_tab(), self.localizationTableFCLS.get("title_lp_tab4", "About LegacyPlay"))
 
         self.save_user_data()
 
@@ -249,13 +267,6 @@ class GUIInterface(QWidget):
         self.apply_theme()
 
         print("GUIInterface initialization success.")
-
-    def get_current_tab_index(self) -> int:
-        return self.tabs.currentIndex()
-
-    def setRPC(self, rpcClass) -> None:
-        self.rpc = rpcClass
-        self.clManager.setRPC(rpcClass)
 
     def create_launch_tab(self) -> QWidget:
         launch_tab = QWidget()
@@ -285,13 +296,13 @@ class GUIInterface(QWidget):
         self.port_field = QLineEdit("53640")
         self.client_select = QComboBox()
         
-        form_layout.addRow("Server IP:", self.ip_field)
-        form_layout.addRow("Server Port:", self.port_field)
-        form_layout.addRow("Client Version:", self.client_select)
+        form_layout.addRow(self.localizationTableFCLS.get("server_ip_label", "Server IP:"), self.ip_field)
+        form_layout.addRow(self.localizationTableFCLS.get("server_port_label", "Server Port:"), self.port_field)
+        form_layout.addRow(self.localizationTableFCLS.get("client_version_label", "Client:"), self.client_select)
         
         button_container = QHBoxLayout()
-        play_btn = QPushButton("Start Playing")
-        host_btn = QPushButton("Host Server")
+        play_btn = QPushButton(self.localizationTableFCLS.get("play_button", "Start Playing"))
+        host_btn = QPushButton(self.localizationTableFCLS.get("host_button", "Host Server"))
         play_btn.setFixedHeight(40)
         host_btn.setFixedHeight(40)
         button_container.addWidget(play_btn)
@@ -322,7 +333,7 @@ class GUIInterface(QWidget):
         layout = QVBoxLayout(center_widget)
         layout.setAlignment(Qt.AlignCenter)
         
-        title = QLabel("User Configuration")
+        title = QLabel(self.localizationTableFCLS.get("title_lp_tab1", "User Configuration"))
         title.setFont(QFont('Segoe UI', 18, QFont.Bold))
         title.setAlignment(Qt.AlignCenter)
         
@@ -335,16 +346,16 @@ class GUIInterface(QWidget):
         
         self.settings_username_field = QLineEdit(self.username)
         self.settings_user_id_field = QLineEdit(self.user_id)
-        self.place_label = QLabel("No place file selected")
+        self.place_label = QLabel(self.localizationTableFCLS.get("place_label_default", "No place file selected"))
         self.place_label.setMaximumWidth(280)
         self.place_label.setStyleSheet("QLabel { margin-left: 8px; }")
         
-        form_layout.addRow("Username:", self.settings_username_field)
-        form_layout.addRow("User ID:", self.settings_user_id_field)
+        form_layout.addRow(self.localizationTableFCLS.get("username_label", "Username:"), self.settings_username_field)
+        form_layout.addRow(self.localizationTableFCLS.get("user_id_label", "User ID:"), self.settings_user_id_field)
         form_layout.addItem(QSpacerItem(20, 10))
-        form_layout.addRow("Place File:", self.place_label)
+        form_layout.addRow(self.localizationTableFCLS.get("place_file_label", "Place File:"), self.place_label)
         
-        file_btn = QPushButton("Select Place File")
+        file_btn = QPushButton(self.localizationTableFCLS.get("select_place_button", "Select Place File"))
         file_btn.setFixedHeight(35)
         
         layout.addWidget(title)
@@ -372,27 +383,48 @@ class GUIInterface(QWidget):
         layout = QVBoxLayout(center_widget)
         layout.setAlignment(Qt.AlignCenter)
         
-        title = QLabel("Launcher Settings")
+        title = QLabel(self.localizationTableFCLS.get("title_lp_tab2", "Launcher Settings"))
         title.setFont(QFont('Segoe UI', 18, QFont.Bold))
         title.setAlignment(Qt.AlignCenter)
         
-        dark_mode_checkbox = QCheckBox("Dark Mode")
+        dark_mode_checkbox = QCheckBox(self.localizationTableFCLS.get("dark_mode_label", "Dark Mode"))
         dark_mode_checkbox.setChecked(self.dark_mode)
         dark_mode_checkbox.stateChanged.connect(self.toggle_dark_mode)
-        dark_mode_checkbox.setStyleSheet("""
-            QCheckBox::indicator {
-                width: 20px;
-                height: 20px;
-            }
-            QCheckBox {{
-                spacing: 10px;
-                font-size: 14px;
-            }}
-        """)
+        
+        dark_mode_container = QWidget()
+        dark_mode_layout = QHBoxLayout(dark_mode_container)
+        dark_mode_layout.addStretch()
+        dark_mode_layout.addWidget(dark_mode_checkbox)
+        dark_mode_layout.addStretch()
+        
+        language_container = QWidget()
+        language_layout = QHBoxLayout(language_container)
+        language_layout.setContentsMargins(0, 0, 0, 0)
+        
+        language_label = QLabel(self.localizationTableFCLS.get("language_label", "Language:"))
+        self.language_combo = QComboBox()
+        self.language_combo.setFixedWidth(200)
+        
+        for lang_code in localizationTable.keys():
+            self.language_combo.addItem(lang_code.upper(), lang_code)
+        
+        current_index = self.language_combo.findData(self.current_language)
+        if current_index >= 0:
+            self.language_combo.setCurrentIndex(current_index)
+        
+        self.language_combo.currentIndexChanged.connect(self.change_language)
+        
+        language_layout.addStretch()
+        language_layout.addWidget(language_label)
+        language_layout.addWidget(self.language_combo)
+        language_layout.addStretch()
         
         layout.addWidget(title)
         layout.addSpacing(20)
-        layout.addWidget(dark_mode_checkbox, alignment=Qt.AlignCenter)
+        layout.addWidget(dark_mode_container, alignment=Qt.AlignCenter)
+        layout.addSpacing(15)
+        layout.addWidget(language_container, alignment=Qt.AlignCenter)
+        layout.addStretch()
         
         main_layout.addStretch()
         main_layout.addWidget(center_widget)
@@ -404,11 +436,11 @@ class GUIInterface(QWidget):
         avatar_tab = QWidget()
         layout = QVBoxLayout(avatar_tab)
         
-        title = QLabel("Avatar")
+        title = QLabel(self.localizationTableFCLS.get("title_lp_tab3", "Avatar"))
         title.setFont(QFont('Segoe UI', 18, QFont.Bold))
         title.setAlignment(Qt.AlignCenter)
 
-        subtext = QLabel("To use multiple avatar items, seperate hat IDs using a semi-colon.")
+        subtext = QLabel(self.localizationTableFCLS.get("subtext_avatar_tab", "To use multiple avatar items, separate hat IDs using a semi-colon."))
         subtext.setFont(QFont('Segoe UI', 10))
         subtext.setStyleSheet("color: #a0a0a0;")
         subtext.setAlignment(Qt.AlignCenter)
@@ -427,19 +459,19 @@ class GUIInterface(QWidget):
         ids_layout = QVBoxLayout()
 
         hat_id_layout = QHBoxLayout()
-        hat_id_label = QLabel("Hat IDs:")
-        hat_id_input = QLineEdit()
+        hat_id_label = QLabel(self.localizationTableFCLS.get("hat_ids_label", "Hat IDs:"))
+        self.hat_id_input = QLineEdit()
         hat_id_layout.addWidget(hat_id_label)
-        hat_id_layout.addWidget(hat_id_input)
+        hat_id_layout.addWidget(self.hat_id_input)
 
         shirt_id_layout = QHBoxLayout()
-        shirt_id_label = QLabel("Shirt ID:")
+        shirt_id_label = QLabel(self.localizationTableFCLS.get("shirt_id_label", "Shirt ID:"))
         self.shirt_id_input = QLineEdit(self.shirtId)
         shirt_id_layout.addWidget(shirt_id_label)
         shirt_id_layout.addWidget(self.shirt_id_input)
 
         pants_id_layout = QHBoxLayout()
-        pants_id_label = QLabel("Pants ID:")
+        pants_id_label = QLabel(self.localizationTableFCLS.get("pants_id_label", "Pants ID:"))
         self.pants_id_input = QLineEdit(self.pantsId)
         pants_id_layout.addWidget(pants_id_label)
         pants_id_layout.addWidget(self.pants_id_input)
@@ -448,6 +480,7 @@ class GUIInterface(QWidget):
 
         self.shirt_id_input.textChanged.connect(self.on_id_changed)
         self.pants_id_input.textChanged.connect(self.on_id_changed)
+        self.hat_id_input.textChanged.connect(self.on_id_changed)
 
         ids_layout.addLayout(hat_id_layout)
         ids_layout.addLayout(shirt_id_layout)
@@ -481,21 +514,19 @@ class GUIInterface(QWidget):
         about_tab = QWidget()
         layout = QVBoxLayout(about_tab)
         
-        title = QLabel("About LegacyPlay")
+        title = QLabel(self.localizationTableFCLS.get("title_lp_tab4", "About LegacyPlay"))
         title.setFont(QFont('Segoe UI', 18, QFont.Bold))
         title.setAlignment(Qt.AlignCenter)
 
         content = QLabel(
-            "LegacyPlay Launcher Application\n\n"
-            "Version: Beta 0.790 | Build Date 0906\n"
-            f"Compiled using Python {sys.version_info.major}.{sys.version_info.minor}\n"
-            "Graphics Framework used: Qt 6/PySide6\n"
+            f"{self.localizationTableFCLS.get("subtext_about_tab", "LegacyPlay Launcher Application\n\n")}"
+            f"{"\n".join(self.localizationTableFCLS.get("about_content", ["NO CONTENT IS RETRIEVED"]))}\n"
         )
         content.setFont(QFont('Segoe UI', 11))
         content.setAlignment(Qt.AlignCenter)
 
         link_label = QLabel(
-            "If assets don't work, <a href=\"#change_cookie\" style=\"text-decoration: underline; color: #007acc;\">click here</a> to change the cookie.<br>"
+            self.localizationTableFCLS.get("link_label", "If assets don't work, <a href=\"#change_cookie\" style=\"text-decoration: underline; color: #007acc;\">click here</a> to change the cookie.<br>")
         )
         link_label.setFont(QFont('Segoe UI', 11))
         link_label.setAlignment(Qt.AlignCenter)
@@ -504,7 +535,7 @@ class GUIInterface(QWidget):
         link_label.linkActivated.connect(self.change_cookie)
 
         link_label2 = QLabel(
-            "Join our <a href=\"#discord_server\" style=\"text-decoration: underline; color: #007acc;\">Discord community server</a> to stay updated!"
+            self.localizationTableFCLS.get("link_label2", "Join our <a href=\"#discord_server\" style=\"text-decoration: underline; color: #007acc;\">Discord community server</a> to stay updated!")
         )
         link_label2.setFont(QFont('Segoe UI', 11))
         link_label2.setAlignment(Qt.AlignCenter)
@@ -513,8 +544,7 @@ class GUIInterface(QWidget):
         link_label2.linkActivated.connect(self.open_discord_url)
 
         footer = QLabel(
-            "\n© 2025 LegacyPlay Development Team\n\n"
-            "We do not own the client binaries, all credits go to the Roblox Corporation."
+            f"\n{self.localizationTableFCLS.get("footer_about_tab", "© 2025 LegacyPlay Development Team\n\nWe do not own the client binaries, all credits go to the Roblox Corporation.")}"
         )
         footer.setFont(QFont('Segoe UI', 11))
         footer.setAlignment(Qt.AlignCenter)
@@ -529,6 +559,51 @@ class GUIInterface(QWidget):
         layout.addStretch()
         
         return about_tab
+
+    def change_language(self, index) -> None:
+        theme = self.get_current_theme_colors()
+
+        lang_code = self.language_combo.itemData(index)
+        self.current_language = lang_code
+        self.save_launcher_data()
+
+        msg = QMessageBox(self)
+        msg.setIcon(QMessageBox.Information)
+        msg.setWindowTitle("Notification")
+        msg.setText("To fully apply the localization changes, you must restart LegacyPlay.")
+        msg.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme['primary']};
+                color: {theme['text']};
+            }}
+            QLabel {{
+                color: {theme['text']};
+                font-size: 13px;
+            }}
+            QPushButton {{
+                padding: 8px 25px;
+                border: none;
+                border-radius: 5px;
+                background-color: {theme['hover']};
+                color: white;
+                min-width: 80px;
+            }}
+            QPushButton:hover {{
+                background-color: {self.darken_color(theme['hover'], 0.9)};
+            }}
+            QPushButton:pressed {{
+                background-color: {self.darken_color(theme['hover'], 0.8)};
+            }}
+        """)
+        msg.setWindowFlags(msg.windowFlags() | Qt.WindowStaysOnTopHint)
+        msg.exec()
+
+    def get_current_tab_index(self) -> int:
+        return self.tabs.currentIndex()
+
+    def setRPC(self, rpcClass) -> None:
+        self.rpc = rpcClass
+        self.clManager.setRPC(rpcClass)
     
     def get_current_theme_colors(self) -> dict[str, str]:
         return {
@@ -552,7 +627,7 @@ class GUIInterface(QWidget):
             }
         }["dark" if self.dark_mode else "light"]
 
-    def darken_color(self, hex_color, factor):
+    def darken_color(self, hex_color, factor) -> str:
         hex_color = hex_color.lstrip('#')
         r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
         r = max(0, min(255, int(r * factor)))
@@ -608,7 +683,7 @@ class GUIInterface(QWidget):
     def on_tab_changed(self, index) -> None:
         tab_names = {
             0: "in the launch menu",
-            1: "configuring settings",
+            1: "configuring the user",
             2: "updating launcher settings",
             3: "customizing avatar",
             4: "viewing the about page"
@@ -721,6 +796,7 @@ class GUIInterface(QWidget):
         print(f"Current colors: {self.body_colors}")
 
     def on_id_changed(self) -> None:
+        self.hatId = self.hat_id_input.text()
         self.shirtId = self.shirt_id_input.text()
         self.pantsId = self.pants_id_input.text()
 
@@ -731,6 +807,7 @@ class GUIInterface(QWidget):
             "username": self.settings_username_field.text(),
             "user_id": self.settings_user_id_field.text(),
             "bodyColors": [int(c) for c in self.body_colors],
+            "hatIds": self.hat_id_input.text() if self.hat_id_input else "0",
             "shirtId": self.shirt_id_input.text() if self.shirt_id_input else "0",
             "pantsId": self.pants_id_input.text() if self.pants_id_input else "0"
         }
@@ -744,6 +821,7 @@ class GUIInterface(QWidget):
     def load_launcher_data(self) -> None:
         default_data = {
             "dark_mode": True,
+            "language": "en",
             "robloxCookie_cc434b1ae21827962753dcb87aa9f49e2e18fc273e8d2f73b955b8e37abd4c47ca0bf5e6a9f4098fe8333d4a52ed26e221f234a493ab10ce241d4b5bf72d57db3f1df9ad3ae40bb03b2cfece398e1fd446a718055fc18e946c2e087cd0a415647ff84fce855ea0edd665fdc56df2fc7f7ba7c7c959b501a88ec8331c0137fde9fb5bd6de71492dfb4ba63d2eb9cb2b97b98151c37fe46771dfcda74cd460b602a9422d648177d89ac32b47c136d122f0a97b6d038e6058e22f59cfb5c4ebe40027a55cc6a0581768b5161e36f61549ab6a6a4f6c6992b0ea2b0e508032e36986668f9a4f1a81f07f3a2167758857fbcbfe67e10001e5f6d4539762aa41090a87": ""
         }
         try:
@@ -751,17 +829,21 @@ class GUIInterface(QWidget):
                 with open(self.launcher_data_file, 'r') as f:
                     data = json.load(f)
                     self.dark_mode = data.get("dark_mode", default_data["dark_mode"])
+                    self.current_language = data.get("language", default_data["language"])
                     self.roblox_cookie = data.get("robloxCookie_cc434b1ae21827962753dcb87aa9f49e2e18fc273e8d2f73b955b8e37abd4c47ca0bf5e6a9f4098fe8333d4a52ed26e221f234a493ab10ce241d4b5bf72d57db3f1df9ad3ae40bb03b2cfece398e1fd446a718055fc18e946c2e087cd0a415647ff84fce855ea0edd665fdc56df2fc7f7ba7c7c959b501a88ec8331c0137fde9fb5bd6de71492dfb4ba63d2eb9cb2b97b98151c37fe46771dfcda74cd460b602a9422d648177d89ac32b47c136d122f0a97b6d038e6058e22f59cfb5c4ebe40027a55cc6a0581768b5161e36f61549ab6a6a4f6c6992b0ea2b0e508032e36986668f9a4f1a81f07f3a2167758857fbcbfe67e10001e5f6d4539762aa41090a87", default_data["robloxCookie_cc434b1ae21827962753dcb87aa9f49e2e18fc273e8d2f73b955b8e37abd4c47ca0bf5e6a9f4098fe8333d4a52ed26e221f234a493ab10ce241d4b5bf72d57db3f1df9ad3ae40bb03b2cfece398e1fd446a718055fc18e946c2e087cd0a415647ff84fce855ea0edd665fdc56df2fc7f7ba7c7c959b501a88ec8331c0137fde9fb5bd6de71492dfb4ba63d2eb9cb2b97b98151c37fe46771dfcda74cd460b602a9422d648177d89ac32b47c136d122f0a97b6d038e6058e22f59cfb5c4ebe40027a55cc6a0581768b5161e36f61549ab6a6a4f6c6992b0ea2b0e508032e36986668f9a4f1a81f07f3a2167758857fbcbfe67e10001e5f6d4539762aa41090a87"])
             else:
                 self.dark_mode = default_data["dark_mode"]
+                self.current_language = default_data["language"]
                 self.roblox_cookie = default_data["robloxCookie_cc434b1ae21827962753dcb87aa9f49e2e18fc273e8d2f73b955b8e37abd4c47ca0bf5e6a9f4098fe8333d4a52ed26e221f234a493ab10ce241d4b5bf72d57db3f1df9ad3ae40bb03b2cfece398e1fd446a718055fc18e946c2e087cd0a415647ff84fce855ea0edd665fdc56df2fc7f7ba7c7c959b501a88ec8331c0137fde9fb5bd6de71492dfb4ba63d2eb9cb2b97b98151c37fe46771dfcda74cd460b602a9422d648177d89ac32b47c136d122f0a97b6d038e6058e22f59cfb5c4ebe40027a55cc6a0581768b5161e36f61549ab6a6a4f6c6992b0ea2b0e508032e36986668f9a4f1a81f07f3a2167758857fbcbfe67e10001e5f6d4539762aa41090a87"]
         except Exception:
             self.dark_mode = default_data["dark_mode"]
+            self.current_language = default_data["language"]
             self.roblox_cookie = default_data["robloxCookie_cc434b1ae21827962753dcb87aa9f49e2e18fc273e8d2f73b955b8e37abd4c47ca0bf5e6a9f4098fe8333d4a52ed26e221f234a493ab10ce241d4b5bf72d57db3f1df9ad3ae40bb03b2cfece398e1fd446a718055fc18e946c2e087cd0a415647ff84fce855ea0edd665fdc56df2fc7f7ba7c7c959b501a88ec8331c0137fde9fb5bd6de71492dfb4ba63d2eb9cb2b97b98151c37fe46771dfcda74cd460b602a9422d648177d89ac32b47c136d122f0a97b6d038e6058e22f59cfb5c4ebe40027a55cc6a0581768b5161e36f61549ab6a6a4f6c6992b0ea2b0e508032e36986668f9a4f1a81f07f3a2167758857fbcbfe67e10001e5f6d4539762aa41090a87"]
 
     def save_launcher_data(self) -> None:
         data = {
             "dark_mode": self.dark_mode,
+            "language": self.current_language,
             "robloxCookie_cc434b1ae21827962753dcb87aa9f49e2e18fc273e8d2f73b955b8e37abd4c47ca0bf5e6a9f4098fe8333d4a52ed26e221f234a493ab10ce241d4b5bf72d57db3f1df9ad3ae40bb03b2cfece398e1fd446a718055fc18e946c2e087cd0a415647ff84fce855ea0edd665fdc56df2fc7f7ba7c7c959b501a88ec8331c0137fde9fb5bd6de71492dfb4ba63d2eb9cb2b97b98151c37fe46771dfcda74cd460b602a9422d648177d89ac32b47c136d122f0a97b6d038e6058e22f59cfb5c4ebe40027a55cc6a0581768b5161e36f61549ab6a6a4f6c6992b0ea2b0e508032e36986668f9a4f1a81f07f3a2167758857fbcbfe67e10001e5f6d4539762aa41090a87": self.roblox_cookie
         }
         with open(self.launcher_data_file, 'w') as f:
@@ -789,7 +871,7 @@ class GUIInterface(QWidget):
         else:
             print("Cookie is in the launcher data file, no action needed.")
 
-    def retrieve_cookie_auto(self, input_field: QLineEdit):
+    def retrieve_cookie_auto(self, input_field: QLineEdit) -> None:
         theme = self.get_current_theme_colors()
         retrieved_cookie = self.cookie_grabber.get_cookie_from_system()
 
@@ -821,8 +903,8 @@ class GUIInterface(QWidget):
         if not retrieved_cookie:
             msg_box = QMessageBox(self)
             msg_box.setIcon(QMessageBox.Warning)
-            msg_box.setWindowTitle("Failed")
-            msg_box.setText("Failed to retrieve the cookie automatically, please get one yourself from https://www.roblox.com/.")
+            msg_box.setWindowTitle(self.localizationTableFCLS.get("failed", "Failed"))
+            msg_box.setText(self.localizationTableFCLS.get("cookie_retrieve_failed", "Failed to retrieve the cookie automatically, please get one yourself from https://www.roblox.com/."))
             msg_box.setStandardButtons(QMessageBox.Ok)
             msg_box.setStyleSheet(message_box_style)
             msg_box.exec()
@@ -832,8 +914,8 @@ class GUIInterface(QWidget):
 
         msg_box = QMessageBox(self)
         msg_box.setIcon(QMessageBox.Information)
-        msg_box.setWindowTitle("Success")
-        msg_box.setText("Successfully retrieved cookie! You may continue now by pressing the \"Save Cookie\" button.")
+        msg_box.setWindowTitle(self.localizationTableFCLS.get("success", "Success"))
+        msg_box.setText(self.localizationTableFCLS.get("cookie_retrieve_success", "Successfully retrieved cookie! You may continue now by pressing the \"Save Cookie\" button."))
         msg_box.setStandardButtons(QMessageBox.Ok)
         msg_box.setStyleSheet(message_box_style)
         msg_box.exec()
@@ -841,7 +923,7 @@ class GUIInterface(QWidget):
     def prompt_for_roblox_cookie(self, initial=True) -> None:
         theme = self.get_current_theme_colors()
         dialog = QDialog(self)
-        dialog.setWindowTitle("Action Required" if initial else "Change Roblox Cookie")
+        dialog.setWindowTitle(self.localizationTableFCLS.get("cookie_dialog_title", "Action Required") if initial else self.localizationTableFCLS.get("cookie_change_title", "Change Roblox Cookie"))
         dialog.setWindowIcon(self.icon)
         dialog.setFixedSize(500, 230)
         dialog.setStyleSheet(f"""
@@ -886,20 +968,20 @@ class GUIInterface(QWidget):
         layout.setContentsMargins(20, 20, 20, 20)
         layout.setSpacing(15)
 
-        title_label = QLabel("Roblox Cookie is required" if initial else "Change your Roblox Cookie.")
+        title_label = QLabel(self.localizationTableFCLS.get("cookie_dialog_title2", "Roblox Cookie is required") if initial else self.localizationTableFCLS.get("cookie_change_title2", "Change your Roblox Cookie"))
         title_label.setFont(QFont('Segoe UI', 14, QFont.Bold))
         title_label.setAlignment(Qt.AlignCenter)
 
         info_label = QLabel(
-            "LegacyPlay requires your .ROBLOSECURITY cookie for Roblox APIs authentication. This will be stored locally and only used for assets downloading.\n"
+            self.localizationTableFCLS.get("cookie_info", "LegacyPlay requires your .ROBLOSECURITY cookie for Roblox APIs authentication. This will be stored locally and only used for assets downloading.")
             if initial else
-            "You can change your .ROBLOSECURITY cookie below. This will be stored locally and only used for assets downloading.\n"
+            self.localizationTableFCLS.get("cookie_change_info", "You can change your .ROBLOSECURITY cookie below. This will be stored locally and only used for assets downloading.")
         )
         info_label.setAlignment(Qt.AlignCenter)
         info_label.setWordWrap(True)
 
         input_field = QLineEdit()
-        input_field.setPlaceholderText("Paste your .ROBLOSECURITY cookie here...")
+        input_field.setPlaceholderText(self.localizationTableFCLS.get("cookie_placeholder", "Paste your .ROBLOSECURITY cookie here..."))
         input_field.setEchoMode(QLineEdit.Password)
         input_field.setMinimumHeight(40)
 
@@ -907,14 +989,14 @@ class GUIInterface(QWidget):
         buttons_layout.setSpacing(10)
         buttons_layout.setContentsMargins(0, 0, 0, 0)
 
-        auto_button = QPushButton("Retrieve it")
+        auto_button = QPushButton(self.localizationTableFCLS.get("retrieve_cookie_button", "Retrieve it"))
         auto_button.setFixedSize(100, 32)
         auto_button.clicked.connect(lambda: self.retrieve_cookie_auto(input_field))
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, dialog)
-        button_box.button(QDialogButtonBox.Ok).setText("Save Cookie")
+        button_box.button(QDialogButtonBox.Ok).setText(self.localizationTableFCLS.get("save_cookie_button", "Save Cookie"))
         button_box.button(QDialogButtonBox.Ok).setFixedSize(150, 32)
-        button_box.button(QDialogButtonBox.Cancel).setText("Exit")
+        button_box.button(QDialogButtonBox.Cancel).setText(self.localizationTableFCLS.get("exit_button", "Exit"))
         button_box.button(QDialogButtonBox.Cancel).setFixedSize(100, 32)
         button_box.accepted.connect(lambda: self.save_cookie_and_close(input_field.text(), dialog))
 
@@ -933,7 +1015,7 @@ class GUIInterface(QWidget):
         layout.addLayout(buttons_layout)
 
         if initial:
-            def reject():
+            def reject() -> None:
                 pass
             dialog.reject = reject
             dialog.setWindowFlag(Qt.WindowCloseButtonHint, False)
@@ -949,8 +1031,8 @@ class GUIInterface(QWidget):
 
             msg = QMessageBox(self)
             msg.setIcon(QMessageBox.Warning)
-            msg.setWindowTitle("Invalid Input")
-            msg.setText("Cookie cannot be empty!")
+            msg.setWindowTitle(self.localizationTableFCLS.get("invalid_input_label", "Invalid Input"))
+            msg.setText(self.localizationTableFCLS.get("cookie_empty", "Cookie cannot be empty!"))
             msg.setStyleSheet(f"""
                 QWidget {{
                     background-color: {theme['primary']};
@@ -983,8 +1065,8 @@ class GUIInterface(QWidget):
 
             msg = QMessageBox(self)
             msg.setIcon(QMessageBox.Warning)
-            msg.setWindowTitle("Invalid Input")
-            msg.setText("This is not a valid .ROBLOSECURITY cookie!")
+            msg.setWindowTitle(self.localizationTableFCLS.get("invalid_input_label", "Invalid Input"))
+            msg.setText(self.localizationTableFCLS.get("cookie_invalid", "This is not a valid .ROBLOSECURITY cookie!"))
             msg.setStyleSheet(f"""
                 QWidget {{
                     background-color: {theme['primary']};
@@ -1027,8 +1109,8 @@ class GUIInterface(QWidget):
         theme = self.get_current_theme_colors()
         msg = QMessageBox(self)
         msg.setIcon(QMessageBox.Critical)
-        msg.setWindowTitle("Cookie Required")
-        msg.setText("LegacyPlay requires a Roblox cookie to function properly.\n\nThe application will now exit.")
+        msg.setWindowTitle(self.localizationTableFCLS.get("cookie_dialog_title2", "Roblox Cookie is required"))
+        msg.setText(self.localizationTableFCLS.get("cookie_required", "LegacyPlay requires a Roblox cookie to function properly.\n\nThe application will now exit."))
         msg.setStyleSheet(f"""
             QWidget {{
                 background-color: {theme['primary']};
@@ -1090,18 +1172,22 @@ class GUIInterface(QWidget):
         self.clManager.copy_place(self._place_file_path)
         result, message = self.clManager.host(self.get_port())
         if not result:
-            self.show_error("Hosting Failed", message)
+            self.show_error(self.localizationTableFCLS.get("failed", "Failed"), message)
 
     def preparePlay(self) -> None:
         if not self.validate_connection():
             return
         
         if self.clManager.isPlaying:
-            QMessageBox.warning(self, "Cannot join", "Cannot join when you are already ingame. Please try closing and try again.")
+            QMessageBox.warning(self, self.localizationTableFCLS.get("failed", "Failed"), self.localizationTableFCLS.get("cannot_join_error", "Cannot join when you are already ingame. Please try closing and try again."))
             return
         
         nonFinalCharData = ";".join(map(str, self.body_colors))
-        finalCharData = f"{nonFinalCharData};{self.shirtId};{self.pantsId}"
+
+        try:
+            finalCharData = f"{nonFinalCharData};{self.shirtId};{self.pantsId};{self.hatId}"
+        except:
+            finalCharData = f"{nonFinalCharData};{self.shirtId};{self.pantsId}"
 
         print(f"Final character data: {finalCharData}")
         
@@ -1113,28 +1199,28 @@ class GUIInterface(QWidget):
         )
 
         if not result:
-            self.show_error("Connection Failed", message)
+            self.show_error(self.localizationTableFCLS.get("failed", "Failed"), message)
 
     def validate_hosting(self) -> bool:
         if not self._place_file_path:
-            self.show_error("Missing File", "Please select a place file to host.")
+            self.show_error(self.localizationTableFCLS.get("failed", "Failed"), self.localizationTableFCLS.get("missing_file_error", "Please select a place file to host."))
             return False
         if not self.get_port():
-            self.show_error("Invalid Port", "Please specify a valid port number.")
+            self.show_error(self.localizationTableFCLS.get("failed", "Failed"), self.localizationTableFCLS.get("invalid_port_error", "Please specify a valid port number."))
             return False
         return True
 
     def validate_connection(self) -> bool:
         if not self.get_ip():
-            self.show_error("Invalid IP", "Please enter a valid server address.")
+            self.show_error(self.localizationTableFCLS.get("failed", "Failed"), self.localizationTableFCLS.get("invalid_ip_error", "Please enter a valid server address."))
             return False
         if not self.get_port():
-            self.show_error("Invalid Port", "Please specify a valid port number.")
+            self.show_error(self.localizationTableFCLS.get("failed", "Failed"), self.localizationTableFCLS.get("invalid_port_error", "Please specify a valid port number."))
             return False
         return True
 
     def show_error(self, title, message) -> None:
-        QMessageBox.warning(self, title, f"{message}\n\nPlease check your settings and try again.")
+        QMessageBox.warning(self, title, f"{message}\n\n{self.localizationTableFCLS.get("general_recommendation", "Please check your settings and try again.")}")
 
     def toggle_dark_mode(self, state) -> None:
         self.dark_mode = bool(state)

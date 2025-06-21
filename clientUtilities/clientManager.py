@@ -97,7 +97,7 @@ class ClientManager:
 
         return True, None
     
-    def join(self, ip, port, charData) -> tuple[Literal[False], Literal['Clients directory does not exist.']] | tuple[Literal[False], Literal['The selected client\'s directory does not exist.']] | tuple[Literal[False], LiteralString] | tuple[Literal[True], None]: # charData format: head_bc;left_arm_bc;torso_bc;right_arm_bc;left_leg_bc;right_leg_bc;shirt_id;pants_id
+    def join(self, ip, port, charData) -> tuple[Literal[False], Literal['Clients directory does not exist.']] | tuple[Literal[False], Literal['The selected client\'s directory does not exist.']] | tuple[Literal[False], LiteralString] | tuple[Literal[True], None]: # charData format: head_bc;left_arm_bc;torso_bc;right_arm_bc;left_leg_bc;right_leg_bc;shirt_id;pants_id;hat_ids
         clientsDir = os.path.join('.', 'Clients')
 
         if not os.path.exists(clientsDir):
