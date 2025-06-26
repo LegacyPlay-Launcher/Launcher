@@ -1,208 +1,31 @@
 import os
 import random
 import json
-import datetime
 from typing import Never
 import webbrowser
 import sys
 from PySide6.QtWidgets import (
     QWidget, QLabel, QLineEdit, QComboBox, QPushButton, QVBoxLayout,
     QFormLayout, QHBoxLayout, QFileDialog, QMessageBox, QTabWidget, QSpacerItem, QCheckBox,
-    QGridLayout, QDialog, QScrollArea, QDialogButtonBox
+    QDialog, QDialogButtonBox
 )
 from PySide6.QtGui import QFont, QIcon
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt
 
 from localization import localizationTable
+from themesStorage import *
+from misc import *
 
 from clientUtilities.clientManager import ClientManager
 from launcherUtilities.webserverManager import WebServerManager
 from launcherUtilities.widgets import AvatarWidget
 from launcherUtilities.cookieGrabber import CookieGrabber
+from launcherUtilities.dialogs import ColorPickerDialog
 
 discord_url = "https://discord.gg/vMjXzuKqs5"
 
-brick_colors = {
-    1: {"name": "White", "hex": "#F2F3F3"},
-    2: {"name": "Grey", "hex": "#A1A5A2"},
-    3: {"name": "Light yellow", "hex": "#F9E999"},
-    5: {"name": "Brick yellow", "hex": "#D7C59A"},
-    6: {"name": "Light green (Mint)", "hex": "#C2DAB9"},
-    9: {"name": "Light reddish violet", "hex": "#E8BCC8"},
-    11: {"name": "Pastel Blue", "hex": "#80BBD9"},
-    12: {"name": "Light orange brown", "hex": "#CC8541"},
-    18: {"name": "Nougat", "hex": "#CC8E69"},
-    21: {"name": "Bright red", "hex": "#C4281C"},
-    22: {"name": "Medium reddish violet", "hex": "#C470A0"},
-    23: {"name": "Bright blue", "hex": "#0D69AC"},
-    24: {"name": "Bright yellow", "hex": "#F5CD30"},
-    25: {"name": "Earth orange", "hex": "#624732"},
-    26: {"name": "Black", "hex": "#1B2A35"},
-    27: {"name": "Dark grey", "hex": "#6D6E6C"},
-    28: {"name": "Dark green", "hex": "#A28F47"},
-    29: {"name": "Medium green", "hex": "#A2C58C"},
-    36: {"name": "Light yellowish orange", "hex": "#F3CF9B"},
-    37: {"name": "Bright green", "hex": "#4B976B"},
-    38: {"name": "Dark orange", "hex": "#A05F35"},
-    39: {"name": "Light bluish violet", "hex": "#C1CADF"},
-    40: {"name": "Transparent", "hex": "#ECECEC"},
-    41: {"name": "Tr. Red", "hex": "#CD544B"},
-    42: {"name": "Tr. Light blue", "hex": "#C1DFF0"},
-    43: {"name": "Tr. Blue", "hex": "#7BB6E8"},
-    44: {"name": "Tr. Yellow", "hex": "#F7F18D"},
-    45: {"name": "Light blue", "hex": "#B4D2E4"},
-    47: {"name": "Tr. Fluorescent Reddish orange", "hex": "#D9856C"},
-    48: {"name": "Tr. Green", "hex": "#84B68D"},
-    49: {"name": "Tr. Fluorescent Green", "hex": "#F8F184"},
-    50: {"name": "Phosphorescent White", "hex": "#ECE8DE"},
-    100: {"name": "Light red", "hex": "#EEC4B6"},
-    101: {"name": "Medium red", "hex": "#DA867A"},
-    102: {"name": "Medium blue", "hex": "#6E99CA"},
-    103: {"name": "Light grey", "hex": "#C7C1B7"},
-    104: {"name": "Bright violet", "hex": "#6B327C"},
-    105: {"name": "Bright yellowish orange", "hex": "#E29B40"},
-    106: {"name": "Bright orange", "hex": "#DA8541"},
-    107: {"name": "Bright bluish green", "hex": "#00939C"},
-    108: {"name": "Earth yellow", "hex": "#685C43"},
-    110: {"name": "Bright bluish violet", "hex": "#435493"},
-    111: {"name": "Transparent Brown", "hex": "#BFB7B1"},
-    112: {"name": "Medium bluish violet", "hex": "#6874AC"},
-    113: {"name": "Transparent Medium reddish violet", "hex": "#E5ADC8"},
-    115: {"name": "Medium yellowish green", "hex": "#C7D23C"},
-    116: {"name": "Medium bluish green", "hex": "#55A5AF"},
-    118: {"name": "Light bluish green", "hex": "#B7D7D5"},
-    119: {"name": "Bright yellowish green", "hex": "#A4BD47"},
-    120: {"name": "Light yellowish green", "hex": "#D9E4A7"},
-    121: {"name": "Medium yellowish orange", "hex": "#E7AC58"},
-    123: {"name": "Bright reddish orange", "hex": "#D36F4C"},
-    124: {"name": "Bright reddish violet", "hex": "#923978"},
-    125: {"name": "Light orange", "hex": "#EAB98E"}
-}
-
-class ColorPickerDialog(QDialog):
-    colorSelected = Signal(int)
-
-    def __init__(self, parent=None, dark_mode=False) -> None:
-        super().__init__(parent)
-        self.setWindowTitle("Color Picker")
-        self.setFixedSize(600, 400)
-        self.setModal(True)
-
-        theme = {
-            "dark": {
-                "primary": "#1a1a1a",
-                "secondary": "#2d2d2d",
-                "text": "#e0e0e0",
-                "border": "#404040",
-                "hover": "#007acc",
-                "scrollbar": "#606060",
-                "tooltip_bg": "#505050",
-                "tooltip_text": "#ffffff"
-            },
-            "light": {
-                "primary": "#ffffff",
-                "secondary": "#f8f9fa",
-                "text": "#212529",
-                "border": "#dee2e6",
-                "hover": "#007acc",
-                "scrollbar": "#dee2e6",
-                "tooltip_bg": "#ffffff",
-                "tooltip_text": "#212529"
-            }
-        }
-        self.t = theme["dark"] if dark_mode else theme["light"]
-
-        self.setStyleSheet(f"""
-            QDialog {{
-                background-color: {self.t['primary']};
-                color: {self.t['text']};
-            }}
-            QScrollBar:horizontal {{
-                background: {self.t['secondary']};
-                height: 10px;
-                margin: 0px;
-            }}
-            QScrollBar::handle:horizontal {{
-                background: {self.t['scrollbar']};
-                min-width: 30px;
-                border-radius: 5px;
-            }}
-            QToolTip {{
-                background-color: {self.t['tooltip_bg']};
-                color: {self.t['tooltip_text']};
-                padding: 5px;
-                border-radius: 4px;
-                border: 1px solid {self.t['border']};
-                font: 11pt 'Segoe UI';
-            }}
-        """)
-
-        self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(15, 15, 15, 15)
-        self.layout.setSpacing(10)
-
-        self.scroll = QScrollArea()
-        self.scroll.setWidgetResizable(True)
-        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        
-        self.container = QWidget()
-        self.grid = QGridLayout(self.container)
-        self.grid.setSpacing(5)
-        self.grid.setContentsMargins(5, 5, 5, 5)
-        
-        self.scroll.setWidget(self.container)
-        self.layout.addWidget(self.scroll)
-
-        self.populate_colors()
-
-        print("ColorPickerDialog initialization success.")
-
-    def populate_colors(self) -> None:
-        row = col = 0
-        columns = 12
-        
-        for color_id, color_info in brick_colors.items():
-            btn = QPushButton()
-            btn.setToolTip(f"{color_info['name']} (#{color_id})")
-            btn.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: {color_info['hex']};
-                    border: 1px solid {self.t['border']};
-                    border-radius: 2px;
-                    margin: 2px;
-                }}
-                QPushButton:hover {{
-                    border: 2px solid {self.t['hover']};
-                }}
-            """)
-
-            btn.clicked.connect(lambda _, cid=color_id: (self.colorSelected.emit(cid), self.accept()))
-            self.grid.addWidget(btn, row, col)
-            
-            col += 1
-            if col >= columns:
-                col = 0
-                row += 1
-
 class GUIInterface(QWidget):
-    RANDOM_PHRASES = [
-        "Welcome to LegacyPlay!",
-        "LegacyPlay creators hope you will enjoy it.",
-        "Reviving classic ROBLOX experience",
-        "Preserving retro clients since early 2025",
-        "Version: Beta 0.790 | Build Date 0906",
-        "Open-Source. Local. Retro.",
-        "Powered by Python with the help of Qt 6/PySide6",
-        f"You've launched LegacyPlay on {datetime.datetime.now().strftime('%Y-%m-%d')}",
-        "The official LegacyPlay Build",
-        "Thank you for playing LegacyPlay 💙",
-        "Go to the About tab to change your cookie!",
-        "LegacyPlay was created on 01/01/2025.",
-        "LegacyPlay wishes you a great gameplay!",
-        "LegacyPlay has 2010L - 2014L.",
-        "LegacyPlay was created by VMsLover on Discord.",
-        f"Join our Discord! {discord_url}"
-    ]
+    RANDOM_PHRASES = ["NO CONTENT IS RETRIEVED"]
 
     def __init__(self, webserver_manager: WebServerManager, cookie_grabber: CookieGrabber) -> None:
         super().__init__()
@@ -228,7 +51,7 @@ class GUIInterface(QWidget):
 
         print(f"Current Local Settings Language: {self.current_language}.")
 
-        self.localizationTableFCLS = localizationTable.get(self.current_language, None)
+        self.localizationTableFCLS = localizationTable.get(self.current_language, None) # localization Table For Current Local Settings
 
         if self.localizationTableFCLS:
             print(f"Got the localization table for the language {self.current_language}.")
@@ -241,8 +64,7 @@ class GUIInterface(QWidget):
             else:
                 print("Got the localization table for the language en.")
 
-        if self.current_language != "en":
-            self.RANDOM_PHRASES = self.localizationTableFCLS.get("randomPhrases", ["If you see this, the localization fucked itself up. Contact VMsLover."])
+        self.RANDOM_PHRASES = self.localizationTableFCLS.get("randomPhrases", ["If you see this, the localization fucked itself up. Contact VMsLover."])
 
         self.check_roblox_cookie()
 
@@ -348,7 +170,7 @@ class GUIInterface(QWidget):
         self.settings_user_id_field = QLineEdit(self.user_id)
         self.place_label = QLabel(self.localizationTableFCLS.get("place_label_default", "No place file selected"))
         self.place_label.setMaximumWidth(280)
-        self.place_label.setStyleSheet("QLabel { margin-left: 8px; }")
+        self.place_label.setStyleSheet(PLACE_LABEL_STYLESHEET)
         
         form_layout.addRow(self.localizationTableFCLS.get("username_label", "Username:"), self.settings_username_field)
         form_layout.addRow(self.localizationTableFCLS.get("user_id_label", "User ID:"), self.settings_user_id_field)
@@ -497,16 +319,7 @@ class GUIInterface(QWidget):
         layout.addLayout(avatar_id_layout)
         layout.addStretch()
 
-        avatar_tab.setStyleSheet("""
-            QLineEdit {
-                min-width: 100px;
-            }
-            QLabel {
-                min-width: 50px;
-                padding-right: 5px;
-                text-align: right;
-            }
-        """)
+        avatar_tab.setStyleSheet(AVATAR_TAB_STYLESHEET)
         
         return avatar_tab
     
@@ -606,26 +419,7 @@ class GUIInterface(QWidget):
         self.clManager.setRPC(rpcClass)
     
     def get_current_theme_colors(self) -> dict[str, str]:
-        return {
-            "dark": {
-                "primary": "#1a1a1a",
-                "secondary": "#262626",
-                "text": "#e0e0e0",
-                "border": "#404040",
-                "hover": "#007acc",
-                "tooltip_bg": "#505050",
-                "tooltip_text": "#ffffff"
-            },
-            "light": {
-                "primary": "#ffffff",
-                "secondary": "#f8f9fa",
-                "text": "#212529",
-                "border": "#dee2e6",
-                "hover": "#6699cc",
-                "tooltip_bg": "#ffffff",
-                "tooltip_text": "#212529"
-            }
-        }["dark" if self.dark_mode else "light"]
+        return theme["dark" if self.dark_mode else "light"]
 
     def darken_color(self, hex_color, factor) -> str:
         hex_color = hex_color.lstrip('#')
@@ -690,74 +484,6 @@ class GUIInterface(QWidget):
         }
         if self.rpc and not self.clManager.isPlaying:
             self.rpc.updatePresence(tab_names.get(index, 'unknown').capitalize())
-
-    def load_stylesheet(self, arrow_svg) -> str:
-        return f"""
-        QWidget {{
-            background-color: #1a1a1a;
-            color: #e0e0e0;
-        }}
-        QLabel {{
-            color: #ffffff;
-        }}
-        QLineEdit, QComboBox {{
-            padding: 10px;
-            border: 2px solid #404040;
-            border-radius: 6px;
-            background-color: #262626;
-            min-width: 280px;
-            font-size: 13px;
-        }}
-        QLineEdit:focus, QComboBox:focus {{
-            border-color: #007acc;
-        }}
-        QPushButton {{
-            padding: 8px 25px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007acc;
-            color: white;
-            font-size: 13px;
-            min-width: 160px;
-        }}
-        QPushButton:hover {{
-            background-color: #006bb3;
-        }}
-        QPushButton:pressed {{
-            background-color: #005c99;
-        }}
-        QTabWidget::pane {{
-            border: none;
-        }}
-        QTabBar::tab {{
-            padding: 12px 25px;
-            background: #262626;
-            color: #a0a0a0;
-            border-top-left-radius: 5px;
-            border-top-right-radius: 5px;
-            margin-right: 4px;
-        }}
-        QTabBar::tab:selected {{
-            background: #2a2a2a;
-            color: #ffffff;
-            border-bottom: 3px solid #007acc;
-        }}
-        QComboBox::drop-down {{
-            subcontrol-origin: padding;
-            subcontrol-position: top right;
-            width: 30px;
-            border-left: 1px solid #404040;
-        }}
-        QComboBox::down-arrow {{
-            image: url({arrow_svg});
-            width: 12px;
-            height: 12px;
-        }}
-        QComboBox QAbstractItemView {{
-            background: #262626;
-            selection-background-color: #007acc;
-        }}
-        """
 
     def load_user_data(self) -> None:
         default_data = {
@@ -1230,71 +956,8 @@ class GUIInterface(QWidget):
     def apply_theme(self) -> None:
         arrow_svg = './Assets/arrow-down-dark.svg' if self.dark_mode else './Assets/arrow-down-light.svg'
         if self.dark_mode:
-            self.setStyleSheet(self.load_stylesheet(arrow_svg))
+            self.setStyleSheet(DARK_MODE_STYLESHEET.replace("||arrow_svg||", arrow_svg))
         else:
-            self.setStyleSheet(f"""
-            QWidget {{
-                background-color: #ffffff;
-                color: #000000;
-            }}
-            QLabel {{
-                color: #000000;
-            }}
-            QLineEdit, QComboBox {{
-                padding: 10px;
-                border: 2px solid #cccccc;
-                border-radius: 6px;
-                background-color: #f0f0f0;
-                min-width: 280px;
-                font-size: 13px;
-            }}
-            QLineEdit:focus, QComboBox:focus {{
-                border-color: #6699cc;
-            }}
-            QPushButton {{
-                padding: 8px 25px;
-                border: none;
-                border-radius: 5px;
-                background-color: #6699cc;
-                color: white;
-                font-size: 13px;
-                min-width: 160px;
-            }}
-            QPushButton:hover {{
-                background-color: #5588bb;
-            }}
-            QPushButton:pressed {{
-                background-color: #4477aa;
-            }}
-            QTabWidget::pane {{
-                border: none;
-            }}
-            QTabBar::tab {{
-                padding: 12px 25px;
-                background: #f0f0f0;
-                color: #333333;
-                border-top-left-radius: 5px;
-                border-top-right-radius: 5px;
-                margin-right: 4px;
-            }}
-            QTabBar::tab:selected {{
-                background: #e0e0e0;
-                color: #000000;
-                border-bottom: 3px solid #6699cc;
-            }}
-            QComboBox::drop-down {{
-                subcontrol-origin: padding;
-                subcontrol-position: top right;
-                width: 30px;
-                border-left: 1px solid #cccccc;
-            }}
-            QComboBox::down-arrow {{
-                image: url({arrow_svg});
-                width: 12px;
-                height: 12px;
-            }}
-            QComboBox QAbstractItemView {{
-                background: #f0f0f0;
-                selection-background-color: #6699cc;
-            }}
-            """)
+            self.setStyleSheet(LIGHT_MODE_STYLESHEET.replace("||arrow_svg||", arrow_svg))
+
+        print(f"Theme applied, is dark: {self.dark_mode}")

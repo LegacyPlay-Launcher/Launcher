@@ -67,7 +67,7 @@ class RPCManager(QObject):
         if self.queued_state:
             self._send_presence_update(self.queued_state)
 
-    def close(self):
+    def close(self) -> None:
         if self.connected:
             self.rpc.close()
             print("RPC connection closed.")

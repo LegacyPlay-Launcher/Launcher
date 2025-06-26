@@ -1,7 +1,6 @@
 from OpenSSL.crypto import X509
 
 import subprocess
-import os
 from OpenSSL import crypto
 
 class SSLManager:

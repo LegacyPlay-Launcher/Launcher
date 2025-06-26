@@ -44,7 +44,7 @@ print("-------------------------------------------------------------------------
 SSL_PATH = "./Certificate/roblox.crt"
 CLIENT_ID = '1348257279983616141'
 
-currentVer = "0_805B"
+currentVer = "0_850B"
 
 open('./launcher.log', 'w').close()
 log_file = open('./launcher.log', 'a')
@@ -53,7 +53,6 @@ if __name__ == "__main__":
     print("Logging init...")
 
     sys.stdout = Tee(sys.__stdout__, log_file)
-    sys.stderr = Tee(sys.__stderr__, log_file)
 
     print("QApplication init...")
 
