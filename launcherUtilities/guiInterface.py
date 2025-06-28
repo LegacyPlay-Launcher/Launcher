@@ -41,8 +41,10 @@ class GUIInterface(QWidget):
         self.user_data_file = "./Data/user_data.json"
         self.launcher_data_file = "./Data/launcher_data.json"
         self.body_colors = [1, 1, 1, 1, 1, 1]
+        self.hatIds = "0"
         self.shirtId = "0"
         self.pantsId = "0"
+        self.hat_id_input = None
         self.shirt_id_input = None
         self.pants_id_input = None
         self.dark_mode = True
@@ -282,7 +284,7 @@ class GUIInterface(QWidget):
 
         hat_id_layout = QHBoxLayout()
         hat_id_label = QLabel(self.localizationTableFCLS.get("hat_ids_label", "Hat IDs:"))
-        self.hat_id_input = QLineEdit()
+        self.hat_id_input = QLineEdit(self.hatIds)
         hat_id_layout.addWidget(hat_id_label)
         hat_id_layout.addWidget(self.hat_id_input)
 
@@ -490,6 +492,7 @@ class GUIInterface(QWidget):
             "username": f"LegacyUser_{random.randint(1000, 9999)}",
             "user_id": str(random.randint(10000000, 99999999)),
             "bodyColors": [1, 1, 1, 1, 1, 1],
+            "hatIds": "0",
             "shirtId": "0",
             "pantsId": "0"
         }
@@ -504,22 +507,26 @@ class GUIInterface(QWidget):
                     if len(self.body_colors) != 6 or not all(isinstance(x, int) for x in self.body_colors):
                         self.body_colors = default_data["bodyColors"]
 
+                    self.hatIds = data.get("hatIds", default_data["hatIds"])
                     self.shirtId = data.get("shirtId", default_data["shirtId"])
                     self.pantsId = data.get("pantsId", default_data["pantsId"])
             else:
                 self.username = default_data["username"]
                 self.user_id = default_data["user_id"]
                 self.body_colors = default_data["bodyColors"]
+                self.hatIds = default_data["hatIds"]
                 self.shirtId = default_data["shirtId"]
                 self.pantsId = default_data["pantsId"]
         except Exception:
             self.username = default_data["username"]
             self.user_id = default_data["user_id"]
             self.body_colors = default_data["bodyColors"]
+            self.hatIds = default_data["hatIds"]
             self.shirtId = default_data["shirtId"]
             self.pantsId = default_data["pantsId"]
 
         print(f"Current colors: {self.body_colors}")
+        print(f"Current hat IDs: {self.hatIds}")
 
     def on_id_changed(self) -> None:
         self.hatId = self.hat_id_input.text()
@@ -533,7 +540,7 @@ class GUIInterface(QWidget):
             "username": self.settings_username_field.text(),
             "user_id": self.settings_user_id_field.text(),
             "bodyColors": [int(c) for c in self.body_colors],
-            "hatIds": self.hat_id_input.text() if self.hat_id_input else "0",
+            "hatIds": self.hatIds,
             "shirtId": self.shirt_id_input.text() if self.shirt_id_input else "0",
             "pantsId": self.pants_id_input.text() if self.pants_id_input else "0"
         }
