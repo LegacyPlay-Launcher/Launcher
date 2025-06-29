@@ -540,7 +540,7 @@ class GUIInterface(QWidget):
             "username": self.settings_username_field.text(),
             "user_id": self.settings_user_id_field.text(),
             "bodyColors": [int(c) for c in self.body_colors],
-            "hatIds": self.hatIds,
+            "hatIds": self.hat_id_input.text() if self.hat_id_input else "0",
             "shirtId": self.shirt_id_input.text() if self.shirt_id_input else "0",
             "pantsId": self.pants_id_input.text() if self.pants_id_input else "0"
         }
