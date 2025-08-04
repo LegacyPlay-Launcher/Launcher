@@ -1,5 +1,6 @@
 from PySide6.QtCore import QTimer, QObject, Signal
 from pypresence import Presence
+from pypresence.exceptions import PipeClosed
 import time
 
 class RPCManager(QObject):
@@ -60,6 +61,17 @@ class RPCManager(QObject):
             self.last_update_time = time.time()
             self.queued_state = None
             print(f"Presence updated: {state}")
+        except PipeClosed as e:
+            # if you reopen the Discord client (or switch accounts), an exception of a type "PipeClosed" occurs.
+            # fixed in LegacyPlay Beta 0.861
+
+            print(f"Pipe closed, attempting to reconnect: {e}")
+            self.connected = False
+            self.connected = self._connect_rpc()
+            if self.connected:
+                self._send_presence_update(state)
+            else:
+                print("Failed to reconnect after pipe closed")
         except Exception as e:
             print(f"Failed to update presence: {e}")
 

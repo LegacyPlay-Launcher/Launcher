@@ -69,31 +69,28 @@ class ClientManager:
 
         if not os.path.exists(clientsDir):
             return False, "Clients directory does not exist."
+        
+        consoleHost = os.path.join(clientsDir, "LP_Conhost.exe")
 
+        if not os.path.exists(consoleHost):
+            return False, f"LegacyPlay Console Host is missing in {clientsDir}, please reinstall LegacyPlay."
+        
         ourClient = os.path.join(clientsDir, self._client)
 
         if not os.path.exists(ourClient):
             return False, "The selected client's directory does not exist."
+        
+        fullConHostPath = os.path.abspath(consoleHost)
 
-        LegacyPlayerBeta = os.path.join(ourClient, 'LegacyPlayerBeta.exe')
-        LegacyApp = os.path.join(ourClient, 'LegacyApp.exe') # 2012 and lower
-
-        if not os.path.exists(LegacyPlayerBeta) and not os.path.exists(LegacyApp):
-            return False, "Client .exe does not exist. Must be LegacyPlayerBeta.exe or LegacyApp.exe for older clients (2012 and lower)."
-        elif os.path.exists(LegacyPlayerBeta):
-            print("Detected RobloxPlayerBeta .exe")
-            subprocess.Popen([
-                LegacyPlayerBeta,
-                "-a", "http://www.roblox.com/Login/Negotiate.ashx",
-                "-t", "1",
-                "-j", f"http://assetgame.roblox.com/Game/gameserver.ashx?port={port}"
-            ])
-        elif os.path.exists(LegacyApp):
-            print("Detected RobloxApp .exe")
-            subprocess.Popen([
-                LegacyApp,
-                "-script", f"dofile('http://assetgame.roblox.com/Game/gameserver.ashx?port={port}')"
-            ])
+        print(f"Running LegacyPlay Console Host for client {self._client}")
+        subprocess.Popen([
+            "cmd.exe",
+            "/c",
+            "start",
+            fullConHostPath,
+            "--hostUrl", f"http://assetgame.roblox.com/Game/gameserver.ashx?port={port}",
+            "--clientDirectory", ourClient
+        ], creationflags=subprocess.CREATE_NEW_CONSOLE)
 
         return True, None
     
