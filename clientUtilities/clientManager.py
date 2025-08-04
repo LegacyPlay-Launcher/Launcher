@@ -79,23 +79,15 @@ class ClientManager:
 
         if not os.path.exists(ourClient):
             return False, "The selected client's directory does not exist."
-        
-        fullConHostPath = os.path.abspath(consoleHost)
 
         print(f"Running LegacyPlay Console Host for client {self._client}")
 
         # AGHHH
 
         subprocess.Popen([
-            "cmd.exe",
-            "/c",
-            "start",
-            "",
-            f'"{fullConHostPath}"',
-            "--hostUrl",
-            f"http://assetgame.roblox.com/Game/gameserver.ashx?port={port}",
-            "--clientDirectory",
-            f'"{ourClient}"' if ' ' in ourClient else ourClient
+            f"{consoleHost}",
+            "--hostUrl", f"http://assetgame.roblox.com/Game/gameserver.ashx?port={port}",
+            "--clientDirectory", ourClient
         ], creationflags=subprocess.CREATE_NEW_CONSOLE)
 
         return True, None
