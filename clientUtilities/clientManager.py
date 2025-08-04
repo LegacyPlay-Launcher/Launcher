@@ -87,9 +87,11 @@ class ClientManager:
             "cmd.exe",
             "/c",
             "start",
-            fullConHostPath,
-            "--hostUrl", f"http://assetgame.roblox.com/Game/gameserver.ashx?port={port}",
-            "--clientDirectory", ourClient
+            f'"{fullConHostPath}"',
+            "--hostUrl",
+            f"http://assetgame.roblox.com/Game/gameserver.ashx?port={port}",
+            "--clientDirectory",
+            f'"{ourClient}"' if ' ' in ourClient else ourClient
         ], creationflags=subprocess.CREATE_NEW_CONSOLE)
 
         return True, None
