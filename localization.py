@@ -5,8 +5,8 @@ import datetime
 import sys
 
 discord_url = "https://discord.gg/vMjXzuKqs5"
-version = "Beta 0.864"
-build_date = "0408"
+version = "Beta 0.868"
+build_date = "0608"
 python_ver = f"{sys.version_info.major}.{sys.version_info.minor}"
 launched_lp = datetime.datetime.now().strftime('%Y-%m-%d')
 

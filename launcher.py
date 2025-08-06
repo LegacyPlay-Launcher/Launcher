@@ -44,7 +44,7 @@ print("-------------------------------------------------------------------------
 SSL_PATH = "./Certificate/roblox.crt"
 CLIENT_ID = '1348257279983616141'
 
-currentVer = "0_864B"
+currentVer = "0_868B"
 
 open('./launcher.log', 'w').close()
 log_file = open('./launcher.log', 'a')
