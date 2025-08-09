@@ -73,7 +73,7 @@ localizationTable = {
             "LegacyPlay was created on 01/01/2025.",
             "LegacyPlay wishes you a great gameplay!",
             "LegacyPlay has 2010L - 2014L.",
-            "LegacyPlay was created by VMsLover on Discord.",
+            "LegacyPlay was created by police_the_creator on Discord.",
             f"Join our Discord! {discord_url}"
         ],
         "about_content": [
@@ -147,7 +147,7 @@ localizationTable = {
             "LegacyPlay был создан 01/01/2025.",
             "LegacyPlay желает вам отличной игры!",
             "LegacyPlay поддерживает клиенты 2010L - 2014L.",
-            "LegacyPlay создан VMsLover в Discord.",
+            "LegacyPlay создан police_the_creator в Discord.",
             f"Присоединяйтесь к нашему Discord! {discord_url}"
         ],
         "about_content": [
@@ -221,7 +221,7 @@ localizationTable = {
             "LegacyPlay criado em 01/01/2025.",
             "LegacyPlay lhe deseja uma ótima gameplay!",
             "Suporta 2010L-2014L",
-            "Criado por VMsLover",
+            "Criado por police_the_creator",
             f"Discord: {discord_url}"
         ],
         "about_content": [
@@ -295,7 +295,7 @@ localizationTable = {
             "LegacyPlay 01/01/2025'de oluşturuldu.",
             "LegacyPlay umuyor ki eğlenirsin!",
             "LegacyPlay 2010L - 2014L'e sahip.",
-            "LegacyPlay, Discord üzerinde VMsLover tarafından oluşturuldu.",
+            "LegacyPlay, Discord üzerinde police_the_creator tarafından oluşturuldu.",
             f"Discord'umuza katıl! {discord_url}"
         ],
         "about_content": [
@@ -369,7 +369,7 @@ localizationTable = {
             "LegacyPlay був створений 01/01/2025.",
             "LegacyPlay бажає вам гарного геймплею!",
             "LegacyPlay має 2010L - 2014L.",
-            "LegacyPlay був створений VMsLover-ом у Діскорді.",
+            "LegacyPlay був створений police_the_creator-ом у Діскорді.",
             f"Заходь до нашого Discord! {discord_url}"
         ],
         "about_content": [
@@ -443,7 +443,7 @@ localizationTable = {
             "LegacyPlay wurde am 01/01/2025 erstellt.",
             "LegacyPlay wünscht dir viel Spaß beim Spielen!",
             "LegacyPlay hat 2010L - 2014L.",
-            "LegacyPlay wurde von VMsLover auf Discord erstellt.",
+            "LegacyPlay wurde von police_the_creator auf Discord erstellt.",
             f"Trete unseren Discord bei! {discord_url}"
         ],
         "about_content": [

@@ -66,7 +66,7 @@ class GUIInterface(QWidget):
             else:
                 print("Got the localization table for the language en.")
 
-        self.RANDOM_PHRASES = self.localizationTableFCLS.get("randomPhrases", ["If you see this, the localization fucked itself up. Contact VMsLover."])
+        self.RANDOM_PHRASES = self.localizationTableFCLS.get("randomPhrases", ["If you see this, the localization fucked itself up. Contact police_the_creator."])
 
         self.check_roblox_cookie()
 
