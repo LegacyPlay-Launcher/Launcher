@@ -1,4 +1,4 @@
-from typing import Literal, LiteralString
+from typing import Literal, Union
 
 
 import subprocess
@@ -64,7 +64,10 @@ class ClientManager:
         except Exception as e:
             print(f"An error occurred while copying place: {e}")
 
-    def host(self, port) -> tuple[Literal[False], Literal['Clients directory does not exist.']] | tuple[Literal[False], Literal['The selected client\'s directory does not exist.']] | tuple[Literal[False], LiteralString] | tuple[Literal[True], None]:
+    def host(self, port) -> Union[
+        tuple[Literal[False], str],
+        tuple[Literal[True], None]
+    ]:
         clientsDir = os.path.join('.', 'Clients')
 
         if not os.path.exists(clientsDir):
@@ -92,7 +95,10 @@ class ClientManager:
 
         return True, None
     
-    def join(self, ip, port, charData) -> tuple[Literal[False], Literal['Clients directory does not exist.']] | tuple[Literal[False], Literal['The selected client\'s directory does not exist.']] | tuple[Literal[False], LiteralString] | tuple[Literal[True], None]: # charData format: head_bc;left_arm_bc;torso_bc;right_arm_bc;left_leg_bc;right_leg_bc;shirt_id;pants_id;hat_ids
+    def join(self, ip, port, charData) -> Union[
+        tuple[Literal[False], str],
+        tuple[Literal[True], None]
+    ]: # charData format: head_bc;left_arm_bc;torso_bc;right_arm_bc;left_leg_bc;right_leg_bc;shirt_id;pants_id;hat_ids
         clientsDir = os.path.join('.', 'Clients')
 
         if not os.path.exists(clientsDir):
