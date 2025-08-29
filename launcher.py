@@ -1,17 +1,13 @@
 """
 
-LEGACYPLAY LAUNCHER
+LEGACYPLAY LAUNCHER APPLICATION
 
 Copyright (c) 2025, LegacyPlay Development Team
 All rights reserved.
 
-All programs provided in this launcher belong to their owners.
-
-This launcher is provided "as is" and comes with no warranty.
+All programs provided in this launcher belong to their owners. We DO NOT own the client binaries, all credits go to the Roblox Corporation.
 
 """
-
-# TestValues().test(window) - tests every value inputs (OUTDATED)
 # webserver_manager.unzip_template_website("2012L") - unzips a template (2012L can be replaced with any template name)
 
 from PySide6.QtWidgets import QApplication
@@ -28,72 +24,69 @@ from launcherUtilities.logger import Tee
 from launcherUtilities.updatesManager import UpdatesManager
 from launcherUtilities.cookieGrabber import CookieGrabber
 from clientUtilities.clientManager import ClientManager
-# from launcherUtilities.tests import TestValues (OUTDATED)
 
 print("\n----------------------------------------------------------------------------\n")
 
-print("LEGACYPLAY LAUNCHER\n")
+print("LEGACYPLAY LAUNCHER APPLICATION\n")
 
 print("Copyright (c) 2025, LegacyPlay Development Team")
 print("All rights reserved.\n")
-
-print("This launcher is provided \"as is\" and comes with no warranty.\n")
 
 print("----------------------------------------------------------------------------\n")
 
 SSL_PATH = "./Certificate/roblox.crt"
 CLIENT_ID = '1348257279983616141'
 
-currentVer = "0_872B"
+currentVer = "0_900B"
 
 open('./launcher.log', 'w').close()
 log_file = open('./launcher.log', 'a')
 
 if __name__ == "__main__":
-    print("Logging init...")
+    print("Logging is initializing...")
 
     sys.stdout = Tee(sys.__stdout__, log_file)
 
-    print("QApplication init...")
+    print("QApplication is initializing...")
 
     app = QApplication([])
 
-    print("Running admin check...")
+    print("Is admin? ", end='')
 
     admin_check = AdminCheck()
     is_admin = admin_check.is_admin()
 
     if not is_admin:
-        print("Did not pass admin rights check, halting...")
+        print("No")
         sys.exit(1)
 
-    print("Passed admin rights check - nice.")
+    print("Yes")
 
-    print("Checking for updates...")
+    print("Checking for any updates...")
 
     updManager = UpdatesManager(currentVer)
     updManager.checkUpdates()
 
-    print("Classes init...")
+    print("Classes are initializing...")
 
     webserver_manager = WebServerManager()
     client_manager = ClientManager(webserver_manager)
     ssl_manager = SSLManager()
     cookie_grabber = CookieGrabber()
 
-    print("Instancing GUI and calling neccesary functions...")
+    print("Instancing the GUI and calling neccesary functions...")
 
     window = GUIInterface(webserver_manager, cookie_grabber)
     window.addClients("./Clients/")
 
-    print("Running checks (except admin check)...")
+    print("Running checks (except the admin check)...")
 
     redist_manager = RedistManager()
 
     if not redist_manager.check_redist_installed():
         redist_manager.exec()
     else:
-        print("VC++ Redist x64 is already installed.")
+        print("VC++ Redist x64 is already installed, skip.")
 
     print(r"Editing hosts file at C:\Windows\System32\drivers\etc\hosts")
 
@@ -105,19 +98,20 @@ if __name__ == "__main__":
     try:
         webserver_manager.start_webserver()
         print("Webserver started with no errors!")
-    except:
-        print("Fallback: removing hosts...")
+    except Exception as e:
+        print("Error! Shutting down LegacyPlay, removing hosts...")
+        print(f"The error message provided by Python: {e}")
         hosts_manager.removeHosts()
-        print("Fallback: Failed to start webserver, halting...")
+        print("Halting...")
         sys.exit(1)
 
-    print("Checking for SSL installation (needed for self-signed certs)...")
+    print("Checking for the SSL certificate installation...")
 
     if not ssl_manager.checkForSSLInstalled(SSL_PATH):
-        print("Installing SSL...")
+        print("Installing the SSL certificate...")
         ssl_manager.installSSL(SSL_PATH)
     else:
-        print("SSL is already installed.")
+        print("The SSL certificate is already installed, skip.")
 
     print("Initializing RPC Manager class (manages Discord RPC)...")
 
@@ -126,19 +120,19 @@ if __name__ == "__main__":
     window.setRPC(rpc)
     window.on_tab_changed(0)
 
-    print("Success.")
+    print(f"Successful! Client ID: {CLIENT_ID}")
 
-    print("Init tasks fully finished, ready to start the LegacyPlay core...")
+    print("Initializing tasks have been completed, ready to show the LegacyPlay GUI...")
 
     window.show()
     app.exec()
 
-    print("Received shutdown callback.")
+    print("Received a GUI shutdown, stopping services.")
 
-    print("Shutting down webserver...")
+    print("Shutting down the webserver...")
     webserver_manager.stop_webserver()
 
-    print("Closing RPC connection...")
+    print("Closing the RPC connection...")
     rpc.close()
 
     print("Cleaning up...")
@@ -146,4 +140,4 @@ if __name__ == "__main__":
     hosts_manager.removeHosts()
     webserver_manager.clear_www()
 
-    print("Done.")
+    print("Finished.")

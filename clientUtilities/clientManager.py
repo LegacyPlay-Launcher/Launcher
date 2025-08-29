@@ -18,19 +18,19 @@ class ClientManager:
         self._client = "2012L"
         self.isPlaying = False
 
-    def _watchThread(self, clientProcess: subprocess.Popen) -> Literal[True]:  
-        print("WatchThread: Client started.")
+    def _checkThread(self, clientProcess: subprocess.Popen) -> Literal[True]:  
+        print("CheckThread: Client started.")
         
         if self._rpc_manager:  
             self._rpc_manager.updatePresence(f"Playing {self._client}")
 
-        print("WatchThread: Changed the RPC.")
+        print("CheckThread: Changed the RPC.")
         
         while True:
             sleep(0.5)
             retcode = clientProcess.poll()
             if retcode is not None:
-                print(f"WatchThread: Client exited with code {retcode}")
+                print(f"CheckThread: Client exited with code {retcode}")
                 break
 
         self.isPlaying = False
@@ -38,9 +38,9 @@ class ClientManager:
         currentIndex = self._guiInterface.get_current_tab_index()
         self._guiInterface.on_tab_changed(currentIndex)
 
-        print("WatchThread: Changed the RPC.")
+        print("CheckThread: Changed the RPC.")
 
-        print("WatchThread: Quitting.")
+        print("CheckThread: Quitting.")
 
         return True
     
@@ -76,7 +76,7 @@ class ClientManager:
         consoleHost = os.path.join(clientsDir, "LP_Conhost.exe")
 
         if not os.path.exists(consoleHost):
-            return False, f"LegacyPlay Console Host is missing in {clientsDir}, please reinstall LegacyPlay."
+            return False, f"LegacyPlay Console Host is missing in {clientsDir}, please reinstall LegacyPlay or put it back to the \"Clients\" directory."
         
         ourClient = os.path.join(clientsDir, self._client)
 
@@ -85,13 +85,11 @@ class ClientManager:
 
         print(f"Running LegacyPlay Console Host for client {self._client}")
 
-        # AGHHH
-
         subprocess.Popen([
             f"{consoleHost}",
             "--hostUrl", f"http://assetgame.roblox.com/Game/gameserver.ashx?port={port}",
             "--clientDirectory", ourClient
-        ], creationflags=subprocess.CREATE_NEW_CONSOLE)
+        ], creationflags=subprocess.CREATE_NO_WINDOW) # The exe variant of the console host is deprecated and just serves a purpose of launching the host client. The other logic has been moved to the dll.
 
         return True, None
     
@@ -109,8 +107,8 @@ class ClientManager:
         if not os.path.exists(ourClient):
             return False, "The selected client's directory does not exist."
 
-        LegacyPlayerBeta = os.path.join(ourClient, 'LegacyPlayerBeta.exe')
-        LegacyApp = os.path.join(ourClient, 'LegacyApp.exe') # 2012 and lower
+        LegacyPlayerBeta = os.path.join(ourClient, 'LegacyPlayerBeta.exe') # newer clients
+        LegacyApp = os.path.join(ourClient, 'LegacyApp.exe') # older clients (2012 and lower)
 
         PopenProcess = None
 
@@ -119,9 +117,9 @@ class ClientManager:
         print(f"Encoded character data: {CharacterDataEncoded}")
 
         if not os.path.exists(LegacyPlayerBeta) and not os.path.exists(LegacyApp):
-            return False, "Client .exe does not exist. Must be LegacyPlayerBeta.exe or LegacyApp.exe for older clients (2012 and lower)."
+            return False, "Client exe does not exist. Must be LegacyPlayerBeta.exe for newer clients or LegacyApp.exe for older clients (2012 and lower)."
         elif os.path.exists(LegacyPlayerBeta):
-            print("Detected RobloxPlayerBeta .exe")
+            print("Detected RobloxPlayerBeta exe")
             PopenProcess = subprocess.Popen([
                 LegacyPlayerBeta,
                 "-a", "http://www.roblox.com/Login/Negotiate.ashx",
@@ -129,7 +127,7 @@ class ClientManager:
                 "-j", f"http://assetgame.roblox.com/Game/join.ashx?ip={ip}&port={port}&charData={CharacterDataEncoded}"
             ])
         elif os.path.exists(LegacyApp):
-            print("Detected RobloxApp .exe")
+            print("Detected RobloxApp exe")
             PopenProcess = subprocess.Popen([
                 LegacyApp,
                 "-script", f"dofile('http://assetgame.roblox.com/Game/join.ashx?ip={ip}&port={port}&charData={CharacterDataEncoded}')"
@@ -137,8 +135,7 @@ class ClientManager:
 
         self.isPlaying = True
 
-        # if self._client != "2010L":
-        watchThreadInstance = threading.Thread(target=self._watchThread, args=(PopenProcess,), daemon=True)
+        watchThreadInstance = threading.Thread(target=self._checkThread, args=(PopenProcess,), daemon=True)
         watchThreadInstance.start()
 
         return True, None

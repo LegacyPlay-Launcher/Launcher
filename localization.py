@@ -1,12 +1,11 @@
-# fucking hell, I hate localization!
-# I want to kms!!!
+# localization file for LegacyPlay
 
 import datetime
 import sys
 
 discord_url = "https://discord.gg/vMjXzuKqs5"
-version = "Beta 0.872"
-build_date = "0908"
+version = "Beta 0.900"
+build_date = "2908"
 python_ver = f"{sys.version_info.major}.{sys.version_info.minor}"
 launched_lp = datetime.datetime.now().strftime('%Y-%m-%d')
 
@@ -73,7 +72,7 @@ localizationTable = {
             "LegacyPlay was created on 01/01/2025.",
             "LegacyPlay wishes you a great gameplay!",
             "LegacyPlay has 2010L - 2014L.",
-            "LegacyPlay was created by police_the_creator on Discord.",
+            "LegacyPlay was created by someoneintheworld_acc on Discord.",
             f"Join our Discord! {discord_url}"
         ],
         "about_content": [
@@ -147,7 +146,7 @@ localizationTable = {
             "LegacyPlay был создан 01/01/2025.",
             "LegacyPlay желает вам отличной игры!",
             "LegacyPlay поддерживает клиенты 2010L - 2014L.",
-            "LegacyPlay создан police_the_creator в Discord.",
+            "LegacyPlay создан someoneintheworld_acc в Discord.",
             f"Присоединяйтесь к нашему Discord! {discord_url}"
         ],
         "about_content": [
@@ -221,7 +220,7 @@ localizationTable = {
             "LegacyPlay criado em 01/01/2025.",
             "LegacyPlay lhe deseja uma ótima gameplay!",
             "Suporta 2010L-2014L",
-            "Criado por police_the_creator",
+            "Criado por someoneintheworld_acc",
             f"Discord: {discord_url}"
         ],
         "about_content": [
@@ -241,29 +240,29 @@ localizationTable = {
         "title_lp_tab4": "LegacyPlay Hakkında",
         "subtext_avatar_tab": "Birden fazla aksesuar giymek için, şapka ID'lerini virgül ile ayır.",
         "subtext_about_tab": "LegacyPlay Launcher Uygulaması\n\n",
-        "footer_about_tab": "© 2025 LegacyPlay Geliştirici Ekip\n\nClient binary'leri bizim değildir, bütün krediler Roblox Corp'una gitmektedir.",
+        "footer_about_tab": "© 2025 LegacyPlay Geliştirici Ekip\n\nClient binary'leri bizim değildir, bütün kreditler Roblox Corp'una gitmektedir.",
         "cookie_dialog_title": "Müdahale Gerek",
         "cookie_change_title": "Roblox Cookie'sini değiştir",
         "cookie_dialog_title2": "Roblox Cookie'si gerekmektedir",
         "cookie_change_title2": "Roblox Cookie'ni değiştir",
         "cookie_retrieve_failed": "Otomatik cookie'yi alma başarasız oldu, lütfen bu siteden cookie'ni geri al: https://www.roblox.com/.",
         "cookie_retrieve_success": "Cookie başarıyla geri getirildi! \"Save Cookie\" butonuna basarak devam edebilirsin.",
-        "cookie_invalid": "Bu doğru bir .ROBLOSECURITY cookie'si değil!",
+        "cookie_invalid": "Bu doğru bir .ROBLOSECURITY Cookie'si değil!",
         "cookie_empty": "Cookie boş olamaz!",
-        "cookie_required": "LegacyPlay düzgün çalışabilmesi için bir Roblox cookie'si lazım. \n\nUygulamadan çıkış yapılıyor.",
+        "cookie_required": "LegacyPlay düzgün çalışabilmesi için bir Roblox Cookie'si lazım. \n\nUygulamadan çıkış yapılıyor.",
         "server_ip_label": "Sunucu IP:",
         "server_port_label": "Sunucu Port:",
         "client_version_label": "Client:",
         "username_label": "Kullanıcı Adı:",
         "user_id_label": "Kullanıcı ID:",
         "place_file_label": "Yer Dosyası:",
-        "hat_ids_label": "Şapka IDleri:",
-        "shirt_id_label": "Tişört IDsi:",
-        "pants_id_label": "Pantolon IDsi:",
+        "hat_ids_label": "Şapka ID'leri:",
+        "shirt_id_label": "Tişört ID:",
+        "pants_id_label": "Pantolon ID:",
         "dark_mode_label": "Karanlık Mod",
         "language_label": "Dil:",
         "place_label_default": "Yer dosyası seçilmedi",
-        "link_label": "Eğer asset'ler çalışmıyorsa, <a href=\"#change_cookie\" style=\"text-decoration: underline; color: #007acc;\">buraya tıkla</a> cookie'ni değiştirmek için <br>",
+        "link_label": "Eğer asset'ler çalışmıyorsa, Cookie'ni değiştirmek için <a href=\"#change_cookie\" style=\"text-decoration: underline; color: #007acc;\">buraya tıkla.</a> <br>",
         "link_label2": "Güncel kalmak için <a href=\"#discord_server\" style=\"text-decoration: underline; color: #007acc;\">Discord sunucumuza</a> katılın!",
         "select_place_button": "Yer Dosyası Seç",
         "play_button": "Oynamaya başla",
@@ -278,13 +277,13 @@ localizationTable = {
         "missing_file_error": "Lütfen Host'lamak için yer dosyası seç.",
         "invalid_port_error": "Lütfen doğru bir Port numarası yazınız.",
         "invalid_ip_error": "Lütfen doğru bir Sunucu adresi yazınız.",
-        "cannot_join_error": "Zaten oyundayken tekrardan katılamazsın. Lütfen kapatıp tekrar deneyin.",
+        "cannot_join_error": "Zaten oyundayken tekrardan katılamazsın. Lütfen açık duran oyunu kapatıp tekrar deneyin.",
         "general_recommendation": "Lütfen ayarlarınıza tekrar bakın ve tekrar deneyin.",
         "randomPhrases": [
             "LegacyPlay'e hoş geldin!",
             "LegacyPlay'in yapımcıları umuyor ki bu deneyimden tatmin kalırsınız.",
             "Klasik ROBLOX deneyimini hayata getiriyoruz",
-            "2025'in başlangıcından beridir eski Client'ları muhazava etmekteyiz",
+            "2025'in başlangıcından beridir eski Client'ları muhafaza etmekteyiz",
             f"Versiyon: {version} | Çıkış Tarihi {build_date}",
             "Açık-kaynak. Lokal. Retro.",
             "Python tarafından güçlendirildi, Qt 6/PySide6'nin yardımıyla.",
@@ -295,7 +294,7 @@ localizationTable = {
             "LegacyPlay 01/01/2025'de oluşturuldu.",
             "LegacyPlay umuyor ki eğlenirsin!",
             "LegacyPlay 2010L - 2014L'e sahip.",
-            "LegacyPlay, Discord üzerinde police_the_creator tarafından oluşturuldu.",
+            "LegacyPlay, Discord üzerinde someoneintheworld_acc tarafından oluşturuldu.",
             f"Discord'umuza katıl! {discord_url}"
         ],
         "about_content": [
@@ -369,7 +368,7 @@ localizationTable = {
             "LegacyPlay був створений 01/01/2025.",
             "LegacyPlay бажає вам гарного геймплею!",
             "LegacyPlay має 2010L - 2014L.",
-            "LegacyPlay був створений police_the_creator-ом у Діскорді.",
+            "LegacyPlay був створений someoneintheworld_acc-ом у Діскорді.",
             f"Заходь до нашого Discord! {discord_url}"
         ],
         "about_content": [
@@ -443,7 +442,7 @@ localizationTable = {
             "LegacyPlay wurde am 01/01/2025 erstellt.",
             "LegacyPlay wünscht dir viel Spaß beim Spielen!",
             "LegacyPlay hat 2010L - 2014L.",
-            "LegacyPlay wurde von police_the_creator auf Discord erstellt.",
+            "LegacyPlay wurde von someoneintheworld_acc auf Discord erstellt.",
             f"Trete unseren Discord bei! {discord_url}"
         ],
         "about_content": [

@@ -19,8 +19,12 @@ class HostsManager:
             for entry in self.entries - existing_lines:
                 hosts_file.write(entry)
 
+        print(f"Written lines to {self.hosts_file_path}")
+
     def removeHosts(self) -> None:
         with open(self.hosts_file_path, 'r') as hosts_file:
             lines = hosts_file.readlines()
         with open(self.hosts_file_path, 'w') as hosts_file:
             hosts_file.writelines(line for line in lines if line not in self.entries)
+
+        print(f"Removed lines from {self.hosts_file_path}")

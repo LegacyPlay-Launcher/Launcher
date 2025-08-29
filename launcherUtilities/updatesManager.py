@@ -52,15 +52,19 @@ class UpdatesManager(QDialog):
         if online_version == self.current_version:
             return
 
+        print(f"Update avaliable! From {self.current_version} -> {online_version}")
+
         prompt = f"Would you like to upgrade LegacyPlay from version {self.current_version} to {online_version}?\n\nThis will save your data and cached assets."
         reply = self._ask_user(prompt)
 
         if not reply:
+            print("User denied the update, proceed to launcher.")
             return
 
         updater_path = self._download_updater()
 
         if not updater_path:
+            print("Failed to download the updater. The webserver might be down. Contact the owner.")
             self._show_message("Update Error", "Failed to download the updater.", critical=True)
             return
 
@@ -68,6 +72,7 @@ class UpdatesManager(QDialog):
             exe_dir = os.path.dirname(sys.executable)
             subprocess.Popen([updater_path, exe_dir], shell=False)
         except Exception as e:
+            print("Failed to download the updater. Might be a build issue. Contact the owner.")
             self._show_message("Update Error", f"Failed to launch the updater: {e}", critical=True)
             return
 

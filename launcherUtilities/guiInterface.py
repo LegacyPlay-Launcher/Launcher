@@ -53,7 +53,7 @@ class GUIInterface(QWidget):
 
         print(f"Current Local Settings Language: {self.current_language}.")
 
-        self.localizationTableFCLS = localizationTable.get(self.current_language, None) # localization Table For Current Local Settings
+        self.localizationTableFCLS = localizationTable.get(self.current_language, None) # the variable name means "localization Table For Current Local Settings"
 
         if self.localizationTableFCLS:
             print(f"Got the localization table for the language {self.current_language}.")
@@ -552,7 +552,7 @@ class GUIInterface(QWidget):
             json.dump(data, f, indent=4)
 
     def load_launcher_data(self) -> None:
-        # TODO: make this shit more secure
+        # TODO: Make this more secure because using a static save entry in a JSON is not very secure.
 
         default_data = {
             "dark_mode": True,
@@ -576,7 +576,7 @@ class GUIInterface(QWidget):
             self.roblox_cookie = default_data["robloxCookie_cc434b1ae21827962753dcb87aa9f49e2e18fc273e8d2f73b955b8e37abd4c47ca0bf5e6a9f4098fe8333d4a52ed26e221f234a493ab10ce241d4b5bf72d57db3f1df9ad3ae40bb03b2cfece398e1fd446a718055fc18e946c2e087cd0a415647ff84fce855ea0edd665fdc56df2fc7f7ba7c7c959b501a88ec8331c0137fde9fb5bd6de71492dfb4ba63d2eb9cb2b97b98151c37fe46771dfcda74cd460b602a9422d648177d89ac32b47c136d122f0a97b6d038e6058e22f59cfb5c4ebe40027a55cc6a0581768b5161e36f61549ab6a6a4f6c6992b0ea2b0e508032e36986668f9a4f1a81f07f3a2167758857fbcbfe67e10001e5f6d4539762aa41090a87"]
 
     def save_launcher_data(self) -> None:
-        # TODO: make this shit more secure
+        # TODO: Make this more secure because using a static save entry in a JSON is not very secure.
 
         data = {
             "dark_mode": self.dark_mode,
