@@ -10,8 +10,6 @@ class AdminCheck:
         except:
             pass
 
-        print("AdminCheck initialization success.")
-
     def is_admin(self) -> bool:
         if not self.admin:
             msg_box = QMessageBox()

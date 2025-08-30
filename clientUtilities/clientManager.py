@@ -119,7 +119,7 @@ class ClientManager:
         if not os.path.exists(LegacyPlayerBeta) and not os.path.exists(LegacyApp):
             return False, "Client exe does not exist. Must be LegacyPlayerBeta.exe for newer clients or LegacyApp.exe for older clients (2012 and lower)."
         elif os.path.exists(LegacyPlayerBeta):
-            print("Detected RobloxPlayerBeta exe")
+            print("Detected LegacyPlayerBeta exe")
             PopenProcess = subprocess.Popen([
                 LegacyPlayerBeta,
                 "-a", "http://www.roblox.com/Login/Negotiate.ashx",
@@ -127,7 +127,7 @@ class ClientManager:
                 "-j", f"http://assetgame.roblox.com/Game/join.ashx?ip={ip}&port={port}&charData={CharacterDataEncoded}"
             ])
         elif os.path.exists(LegacyApp):
-            print("Detected RobloxApp exe")
+            print("Detected LegacyApp exe")
             PopenProcess = subprocess.Popen([
                 LegacyApp,
                 "-script", f"dofile('http://assetgame.roblox.com/Game/join.ashx?ip={ip}&port={port}&charData={CharacterDataEncoded}')"

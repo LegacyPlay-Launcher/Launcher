@@ -66,7 +66,7 @@ class GUIInterface(QWidget):
             else:
                 print("Got the localization table for the language en.")
 
-        self.RANDOM_PHRASES = self.localizationTableFCLS.get("randomPhrases", ["If you see this, the localization fucked itself up. Contact police_the_creator."])
+        self.RANDOM_PHRASES = self.localizationTableFCLS.get("randomPhrases", ["If you see this, the localization fucked itself up. Contact someoneintheworld_acc."])
 
         self.check_roblox_cookie()
 
@@ -529,7 +529,7 @@ class GUIInterface(QWidget):
         print(f"Current hat IDs: {self.hatIds}")
 
     def on_id_changed(self) -> None:
-        self.hatId = self.hat_id_input.text()
+        self.hatIds = self.hat_id_input.text()
         self.shirtId = self.shirt_id_input.text()
         self.pantsId = self.pants_id_input.text()
 
@@ -894,7 +894,27 @@ class GUIInterface(QWidget):
     def addClients(self, clientsDir) -> None:
         try:
             clients = [d for d in os.listdir(clientsDir) if os.path.isdir(os.path.join(clientsDir, d))]
-            self.client_select.addItems(clients)
+
+            # E → M → L
+            def sort_key(client_name: str):
+                base = ""
+                suffix = ""
+                for i, c in enumerate(client_name):
+                    if c.isdigit():
+                        base += c
+                    else:
+                        suffix = client_name[i:]
+                        break
+                year = int(base) if base.isdigit() else float('inf')
+                # E=0, M=1, L=2, others=3
+                suffix_priority = {"E": 0, "M": 1, "L": 2}.get(suffix.upper(), 3)
+                return (year, suffix_priority)
+
+            sorted_clients = sorted(clients, key=sort_key)
+            
+            self.client_select.clear()
+            self.client_select.addItems(sorted_clients)
+
         except Exception as e:
             print(f"Client loading error: {str(e)}")
 
@@ -916,13 +936,13 @@ class GUIInterface(QWidget):
             return
         
         if self.clManager.isPlaying:
-            QMessageBox.warning(self, self.localizationTableFCLS.get("failed", "Failed"), self.localizationTableFCLS.get("cannot_join_error", "Cannot join when you are already ingame. Please try closing and try again."))
+            QMessageBox.warning(self, self.localizationTableFCLS.get("failed", "Failed"), self.localizationTableFCLS.get("cannot_join_error", "Cannot join when you are already ingame. Please try closing the client and trying again."))
             return
         
         nonFinalCharData = ";".join(map(str, self.body_colors))
 
         try:
-            finalCharData = f"{nonFinalCharData};{self.shirtId};{self.pantsId};{self.hatId}"
+            finalCharData = f"{nonFinalCharData};{self.shirtId};{self.pantsId};{self.hatIds}"
         except:
             finalCharData = f"{nonFinalCharData};{self.shirtId};{self.pantsId}"
 
