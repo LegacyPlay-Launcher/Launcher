@@ -27,12 +27,12 @@ from clientUtilities.clientManager import ClientManager
 
 print("\n----------------------------------------------------------------------------\n")
 
-print("LEGACYPLAY LAUNCHER APPLICATION\n")
+print("\nLEGACYPLAY LAUNCHER APPLICATION\n")
 
 print("Copyright (c) 2025, LegacyPlay Development Team")
 print("All rights reserved.\n")
 
-print("----------------------------------------------------------------------------\n")
+print("\n----------------------------------------------------------------------------\n")
 
 SSL_PATH = "./Certificate/roblox.crt"
 CLIENT_ID = '1348257279983616141'
